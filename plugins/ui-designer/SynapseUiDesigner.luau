@@ -45,6 +45,125 @@ local BRAND = {
 	FontBold = Enum.Font.GothamBold,
 }
 
+local DesignSystem = {
+	Spacing = { XS = 4, SM = 8, MD = 12, LG = 16, XL = 24 },
+	Size = { Header = 48, Toolbar = 36, Tab = 34, Button = 32, Input = 32, Status = 28 },
+	Radius = { Small = 6, Medium = 8, Large = 10, Pill = 999 },
+	Motion = {
+		Fast = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Normal = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Press = TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Release = TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+	},
+	Color = {
+		Background = BRAND.Background,
+		Surface = BRAND.Surface,
+		SurfaceAlt = BRAND.SurfaceAlt,
+		Border = BRAND.Border,
+		Accent = BRAND.Accent,
+		Text = BRAND.Text,
+		TextMuted = BRAND.TextMuted,
+		Success = BRAND.Success,
+		Warning = BRAND.Warning,
+		Danger = BRAND.Danger,
+	},
+	Font = {
+		Regular = BRAND.Font,
+		Medium = BRAND.FontMedium,
+		Semibold = BRAND.FontSemibold,
+		Bold = BRAND.FontBold,
+	},
+}
+
+local function applyCorner(instance: Instance, radius: number)
+	local corner = instance:FindFirstChildOfClass("UICorner") or Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, radius)
+	corner.Parent = instance
+	return corner
+end
+
+local function applyBorder(instance: Instance, color: Color3?, transparency: number?)
+	local stroke = instance:FindFirstChildOfClass("UIStroke") or Instance.new("UIStroke")
+	stroke.Thickness = 1
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = color or DesignSystem.Color.Border
+	stroke.Transparency = transparency or 0
+	stroke.Parent = instance
+	return stroke
+end
+
+local function styleSurface(instance: GuiObject, radius: number?)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	applyCorner(instance, radius or DesignSystem.Radius.Medium)
+	applyBorder(instance)
+	return instance
+end
+
+local function styleButton(instance: GuiButton, accent: boolean?)
+	instance.AutoButtonColor = false
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = accent and DesignSystem.Color.Accent or DesignSystem.Color.SurfaceAlt
+	instance.TextColor3 = DesignSystem.Color.Text
+	instance.Font = DesignSystem.Font.Semibold
+	instance.TextSize = 13
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance, accent and DesignSystem.Color.Accent or DesignSystem.Color.Border)
+	local scale = instance:FindFirstChildOfClass("UIScale") or Instance.new("UIScale")
+	scale.Scale = 1
+	scale.Parent = instance
+	instance.MouseEnter:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Fast, { Scale = 1.02 }):Play()
+	end)
+	instance.MouseLeave:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Fast, { Scale = 1 }):Play()
+	end)
+	instance.MouseButton1Down:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Press, { Scale = 0.97 }):Play()
+	end)
+	instance.MouseButton1Up:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Release, { Scale = 1 }):Play()
+	end)
+	return instance
+end
+
+local function styleInput(instance: TextBox)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Background
+	instance.TextColor3 = DesignSystem.Color.Text
+	instance.PlaceholderColor3 = DesignSystem.Color.TextMuted
+	instance.Font = DesignSystem.Font.Regular
+	instance.TextSize = 13
+	instance.ClearTextOnFocus = false
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance)
+	return instance
+end
+
+local function styleTab(instance: GuiButton, active: boolean)
+	instance.AutoButtonColor = false
+	instance.BackgroundTransparency = 0
+	instance.BackgroundColor3 = active and DesignSystem.Color.SurfaceAlt or DesignSystem.Color.Surface
+	instance.TextColor3 = active and DesignSystem.Color.Text or DesignSystem.Color.TextMuted
+	instance.Font = DesignSystem.Font.Semibold
+	instance.TextSize = 13
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance, active and DesignSystem.Color.Accent or DesignSystem.Color.Border)
+	return instance
+end
+
+local function styleHeader(instance: GuiObject)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	return instance
+end
+
+local function styleStatus(instance: GuiObject)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	return instance
+end
+
 local EFFECTS_ICON = BRAND.Logo
 local LEFT_PAD = 24
 local RULER_H = 24
@@ -225,7 +344,7 @@ local function create(className, properties, parent)
 end
 
 local function corner(parent, radius)
-	return create("UICorner", { CornerRadius = UDim.new(0, radius or 4) }, parent)
+	return applyCorner(parent, radius or DesignSystem.Radius.Small)
 end
 
 local function padding(parent, l, r, t, b)
