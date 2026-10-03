@@ -2,9 +2,9 @@
 
 # <span style="color:#A78BFA">✦ SYNAPSE</span>
 
-### <span style="color:#60A5FA">Tools built for Roblox creators.</span>
+### <span style="color:#60A5FA">Professional tools for Roblox creators.</span>
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=18&duration=3500&pause=1400&color=A78BFA&center=true&vCenter=true&width=520&lines=CREATE.;DESIGN.;BUILD.;" alt="Synapse" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=17&duration=4000&pause=1800&color=A78BFA&center=true&vCenter=true&width=500&lines=CREATE.;DESIGN.;BUILD.;" alt="Synapse" />
 
 </div>
 
@@ -12,9 +12,9 @@
 
 ## About
 
-**Synapse** is an independent ecosystem focused on creating professional tools for **Roblox Studio**.
+**Synapse** is an independent ecosystem of tools built for **Roblox Studio**.
 
-Each project is developed individually, with its own purpose and workflow, while sharing the same goal: making development more creative, efficient and powerful.
+The goal is simple: turn repetitive workflows into polished, efficient and creator-focused tools.
 
 ---
 
@@ -22,30 +22,46 @@ Each project is developed individually, with its own purpose and workflow, while
 
 ### 🛠️ Synapse Tool Configurator
 
-**Synapse Tool Configurator** is a Roblox Studio plugin that makes Tool creation faster and easier.
+A Roblox Studio plugin designed to make **Tool creation faster and easier**.
 
-Convert models and parts into fully configured Tools with automatic Handle setup, joints, Grip settings, and attachments. Includes smart validation, backups, customizable options, and a complete one-click Tool Setup system.
+Convert models and parts into fully configured Tools with automatic **Handle setup, joints, Grip settings and attachments**. Includes smart validation, backups, customizable options and a complete one-click Tool Setup workflow.
 
-Perfect for weapons, simulator items, equipment, and custom assets. Simplify your workflow and create professional Tools with ease.
+Ideal for weapons, simulator items, equipment and custom assets.
 
-**[View on Roblox Creator Store →](https://create.roblox.com/dashboard/creations/store/121407719443899/configure)**
+<p>
+<a href="https://create.roblox.com/dashboard/creations/store/121407719443899/configure">
+<img src="https://img.shields.io/badge/Roblox-Creator%20Store-00A2FF?style=for-the-badge&logo=roblox&logoColor=white" alt="Roblox Creator Store"/>
+</a>
+<a href="https://github.com/playersynapse-tech/Synapse/blob/main/SynapseToolConfig.luau">
+<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Source Code"/>
+</a>
+</p>
 
 ---
 
 ### 🎨 Synapse UI Designer
 
-**Synapse UI Designer** is a visual UI creation and animation tool for Roblox Studio, combining a hierarchy, preview workspace, inspector and keyframe timeline into one workflow.
+A visual **UI creation and animation** tool for Roblox Studio, built around a hierarchy, preview workspace, inspector and keyframe timeline.
 
-Create and animate UI elements with position, size, rotation, color and transparency controls, use easing and playback tools, apply ready-made effects, work with animation events, and save reusable UI animations directly into Roblox Studio.
+Create and animate interfaces with property controls, easing, playback, ready-made effects, animation events, auto-key workflows, shortcuts, undo/redo and reusable UI animation data.
 
-**[View on Roblox Creator Store →](https://create.roblox.com/dashboard/creations/store/136370912247705/configure)**
+Designed to make professional UI animation more visual, organized and efficient.
+
+<p>
+<a href="https://create.roblox.com/dashboard/creations/store/136370912247705/configure">
+<img src="https://img.shields.io/badge/Roblox-Creator%20Store-00A2FF?style=for-the-badge&logo=roblox&logoColor=white" alt="Roblox Creator Store"/>
+</a>
+<a href="https://github.com/playersynapse-tech/Synapse/blob/main/SynapseUiDesigner.luau">
+<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Source Code"/>
+</a>
+</p>
 
 ---
 
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:312E81,100:06B6D4&height=90&section=footer" width="100%" alt="" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0F172A,50:312E81,100:06B6D4&height=80&section=footer" width="100%" alt="" />
 
-<sub><span style="color:#64748B">Created by Synapse Player</span></sub>
+<sub>Created by <strong>Synapse Player</strong></sub>
 
 </div>
