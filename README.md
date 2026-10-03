@@ -29,11 +29,11 @@ Convert models and parts into fully configured Tools with automatic **Handle set
 Ideal for weapons, simulator items, equipment and custom assets.
 
 <p>
-<a href="https://create.roblox.com/dashboard/creations/store/121407719443899/configure">
-<img src="https://img.shields.io/badge/Roblox-Creator%20Store-00A2FF?style=for-the-badge&logo=roblox&logoColor=white" alt="Roblox Creator Store"/>
+<a href="./plugins/tool-configurator/">
+<img src="https://img.shields.io/badge/Plugin-Page-A78BFA?style=for-the-badge" alt="Plugin Page"/>
 </a>
-<a href="https://github.com/playersynapse-tech/Synapse/blob/main/SynapseToolConfig.luau">
-<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Source Code"/>
+<a href="./plugins/tool-configurator/SynapseToolConfig.luau">
+<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="Source Code"/>
 </a>
 </p>
 
@@ -48,11 +48,11 @@ Create and animate interfaces with property controls, easing, playback, ready-ma
 Designed to make professional UI animation more visual, organized and efficient.
 
 <p>
-<a href="https://create.roblox.com/dashboard/creations/store/136370912247705/configure">
-<img src="https://img.shields.io/badge/Roblox-Creator%20Store-00A2FF?style=for-the-badge&logo=roblox&logoColor=white" alt="Roblox Creator Store"/>
+<a href="./plugins/ui-designer/">
+<img src="https://img.shields.io/badge/Plugin-Page-A78BFA?style=for-the-badge" alt="Plugin Page"/>
 </a>
-<a href="https://github.com/playersynapse-tech/Synapse/blob/main/SynapseUiDesigner.luau">
-<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Source Code"/>
+<a href="./plugins/ui-designer/SynapseUiDesigner.luau">
+<img src="https://img.shields.io/badge/GitHub-Source%20Code-181717?style=for-the-badge&logo=github&logoColor=white" alt="Source Code"/>
 </a>
 </p>
 
