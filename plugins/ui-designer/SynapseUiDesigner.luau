@@ -25,7 +25,27 @@ local MAX_IMPORT_EVENTS = 1000
 local MAX_ANIMATION_TIME = 3600
 local MAX_EVENT_PARAMS = 24
 local LOGO_IMAGE = "rbxassetid://136078562940326"
-local EFFECTS_ICON = LOGO_IMAGE
+local BRAND = {
+	Name = "Synapse",
+	Logo = LOGO_IMAGE,
+	Accent = BRAND.Accent,
+	Success = BRAND.Success,
+	Warning = BRAND.Warning,
+	Danger = BRAND.Danger,
+	Background = BRAND.Background,
+	Surface = BRAND.Surface,
+	SurfaceAlt = BRAND.SurfaceAlt,
+	Text = BRAND.Text,
+	TextMuted = BRAND.TextMuted,
+	Border = BRAND.Border,
+	Radius = 8,
+	Font = Enum.Font.Gotham,
+	FontMedium = BRAND.FontMedium,
+	FontSemibold = BRAND.FontSemibold,
+	FontBold = BRAND.FontBold,
+}
+
+local EFFECTS_ICON = BRAND.Logo
 local LEFT_PAD = 24
 local RULER_H = 24
 local KEY_LANE_Y = 54
@@ -72,26 +92,26 @@ local STYLES = Enum.EasingStyle:GetEnumItems()
 local DIRECTIONS = Enum.EasingDirection:GetEnumItems()
 
 local C = {
-	bg = Color3.fromRGB(46, 46, 46),
-	bar = Color3.fromRGB(37, 37, 37),
-	lane = Color3.fromRGB(34, 34, 34),
-	laneKeys = Color3.fromRGB(37, 37, 37),
+	bg = BRAND.Background,
+	bar = BRAND.Surface,
+	lane = BRAND.Border,
+	laneKeys = BRAND.Surface,
 	laneEvents = Color3.fromRGB(44, 44, 48),
-	row = Color3.fromRGB(60, 60, 60),
-	text = Color3.fromRGB(229, 229, 229),
-	textDim = Color3.fromRGB(170, 170, 170),
-	blue = Color3.fromRGB(0, 122, 255),
-	red = Color3.fromRGB(214, 90, 60),
-	green = Color3.fromRGB(76, 175, 80),
-	orange = Color3.fromRGB(246, 136, 0),
-	purple = Color3.fromRGB(0, 122, 255),
-	teal = Color3.fromRGB(0, 122, 255),
-	event = Color3.fromRGB(0, 122, 255),
-	danger = Color3.fromRGB(214, 90, 60),
+	row = BRAND.SurfaceAlt,
+	text = BRAND.Text,
+	textDim = BRAND.TextMuted,
+	blue = BRAND.Accent,
+	red = BRAND.Danger,
+	green = BRAND.Success,
+	orange = BRAND.Warning,
+	purple = BRAND.Accent,
+	teal = BRAND.Accent,
+	event = BRAND.Accent,
+	danger = BRAND.Danger,
 	gray = Color3.fromRGB(95, 95, 95),
-	key = Color3.fromRGB(0, 122, 255),
-	keySel = Color3.fromRGB(246, 136, 0),
-	playhead = Color3.fromRGB(214, 90, 60),
+	key = BRAND.Accent,
+	keySel = BRAND.Warning,
+	playhead = BRAND.Danger,
 	selected = Color3.fromRGB(60, 80, 110),
 }
 
@@ -1113,7 +1133,7 @@ local statusLabel = create("TextLabel", {
 	BackgroundTransparency = 1,
 	Text = "",
 	TextColor3 = C.textDim,
-	Font = Enum.Font.SourceSans,
+	Font = BRAND.Font,
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Left,
 	TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1125,7 +1145,7 @@ local hintLabel = create("TextLabel", {
 	BackgroundTransparency = 1,
 	Text = "",
 	TextColor3 = C.textDim,
-	Font = Enum.Font.SourceSans,
+	Font = BRAND.Font,
 	TextSize = 14,
 	TextXAlignment = Enum.TextXAlignment.Right,
 	TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1180,7 +1200,7 @@ local function topButton(key, text, color, width, tooltip)
 		BorderSizePixel = 0,
 		Text = text,
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 13,
 		AutoButtonColor = true,
 		LayoutOrder = topOrder(),
@@ -1237,7 +1257,7 @@ do
 		BackgroundTransparency = 1,
 		Text = "Effects",
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 13,
 	}, holder)
 	tip(button, "Open the Effects panel: ready-made animations (F)")
@@ -1291,7 +1311,7 @@ local function sideHeader(text)
 		BackgroundTransparency = 1,
 		Text = text,
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		LayoutOrder = sideOrder(),
@@ -1305,7 +1325,7 @@ local function sideButton(text, color)
 		BorderSizePixel = 0,
 		Text = text,
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		LayoutOrder = sideOrder(),
 	}, side)
@@ -1318,7 +1338,7 @@ local propsHeader = create("TextButton", {
 	BackgroundTransparency = 1,
 	Text = "[-] RECORDED PROPERTIES",
 	TextColor3 = C.textDim,
-	Font = Enum.Font.SourceSansBold,
+	Font = BRAND.FontBold,
 	TextSize = 13,
 	TextXAlignment = Enum.TextXAlignment.Left,
 	LayoutOrder = sideOrder(),
@@ -1387,7 +1407,7 @@ for _, property in ipairs(PROPERTY_CATALOG) do
 		BackgroundTransparency = 1,
 		Text = DISPLAY_NAMES[property] or property,
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1400,7 +1420,7 @@ for _, property in ipairs(PROPERTY_CATALOG) do
 		BorderSizePixel = 0,
 		Text = "",
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		ClearTextOnFocus = false,
 	}, row)
@@ -1438,7 +1458,7 @@ create("TextLabel", {
 	BackgroundTransparency = 1,
 	Text = "Time (s)",
 	TextColor3 = C.text,
-	Font = Enum.Font.SourceSans,
+	Font = BRAND.Font,
 	TextSize = 13,
 	TextXAlignment = Enum.TextXAlignment.Left,
 }, timeRow)
@@ -1450,7 +1470,7 @@ Insp.timeBox = create("TextBox", {
 	Text = "",
 	PlaceholderText = "-",
 	TextColor3 = C.text,
-	Font = Enum.Font.SourceSans,
+	Font = BRAND.Font,
 	TextSize = 13,
 	ClearTextOnFocus = false,
 }, timeRow)
@@ -1500,7 +1520,7 @@ create("TextLabel", {
 	BackgroundTransparency = 1,
 	Text = 'Each event has typed parameters (Text, Number, Bool, Vec2, Color). Use "+ Param" for a row, or type name=value pairs in the quick box and press Enter, e.g. damage=10, sound="hit", crit=true. ON/OFF mutes an event without deleting it; "..." has presets, duplicate, move, copy and paste.',
 	TextColor3 = C.textDim,
-	Font = Enum.Font.SourceSans,
+	Font = BRAND.Font,
 	TextSize = 12,
 	TextWrapped = true,
 	TextXAlignment = Enum.TextXAlignment.Left,
@@ -1580,7 +1600,7 @@ local helpClose = create("TextButton", {
 	BorderSizePixel = 0,
 	Text = "Close",
 	TextColor3 = Color3.new(1, 1, 1),
-	Font = Enum.Font.SourceSansBold,
+	Font = BRAND.FontBold,
 	TextSize = 14,
 	Visible = false,
 	ZIndex = 210,
@@ -1682,7 +1702,7 @@ do
 				BorderSizePixel = 0,
 				Text = text,
 				TextColor3 = C.text,
-				Font = Enum.Font.SourceSans,
+				Font = BRAND.Font,
 				TextSize = 13,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextTruncate = Enum.TextTruncate.AtEnd,
@@ -1993,7 +2013,7 @@ function A.rebuildEventOverview()
 			BackgroundTransparency = 1,
 			Text = "No events in this animation yet.",
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}, frame)
@@ -2024,7 +2044,7 @@ function A.rebuildEventOverview()
 					params ~= "" and ("  " .. params) or ""
 				),
 				TextColor3 = off and C.textDim or C.event,
-				Font = Enum.Font.SourceSans,
+				Font = BRAND.Font,
 				TextSize = 12,
 				TextXAlignment = Enum.TextXAlignment.Left,
 				TextTruncate = Enum.TextTruncate.AtEnd,
@@ -2050,7 +2070,7 @@ function A.rebuildEventOverview()
 			BackgroundTransparency = 1,
 			Text = string.format("+ %d more event(s)", total - shown),
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 12,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			LayoutOrder = order + 1,
@@ -2073,7 +2093,7 @@ function A.rebuildEventList()
 			BackgroundTransparency = 1,
 			Text = keyframe and "No events on this keyframe." or "Select a keyframe to edit its events.",
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}, frame)
@@ -2098,7 +2118,7 @@ function A.rebuildEventList()
 			BorderSizePixel = 0,
 			Text = text,
 			TextColor3 = Color3.new(1, 1, 1),
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 12,
 			AutoButtonColor = true,
 		}, parent)
@@ -2166,7 +2186,7 @@ function A.rebuildEventList()
 			"Event name",
 			UDim2.fromOffset(34, 1),
 			UDim2.new(1, -112, 0, 22),
-			Enum.Font.SourceSansBold,
+			BRAND.FontBold,
 			enabled and C.event or C.textDim
 		)
 		nameBox.TextSize = 14
@@ -3679,7 +3699,7 @@ function A.rebuildTimeline()
 			BackgroundTransparency = 1,
 			Text = step < 1 and string.format("%.2fs", i * step) or string.format("%ds", i * step),
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 11,
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}, scroll)
@@ -3774,7 +3794,7 @@ function A.rebuildTimeline()
 			BackgroundTransparency = 1,
 			Text = fmtTime(keyframe.Time),
 			TextColor3 = isSelected and C.keySel or C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 12,
 			ZIndex = 5,
 		}, scroll)
@@ -3806,7 +3826,7 @@ function A.rebuildTimeline()
 				BorderSizePixel = 0,
 				Text = #keyframe.Events > 1 and tostring(#keyframe.Events) or "",
 				TextColor3 = isSelected and Color3.new(0, 0, 0) or Color3.new(1, 1, 1),
-				Font = Enum.Font.SourceSansBold,
+				Font = BRAND.FontBold,
 				TextSize = 12,
 				AutoButtonColor = false,
 				ZIndex = 6,
@@ -3839,7 +3859,7 @@ function A.rebuildTimeline()
 					BackgroundTransparency = 1,
 					Text = keyframe.Events[1].Name .. (#keyframe.Events > 1 and (" +" .. (#keyframe.Events - 1)) or ""),
 					TextColor3 = C.event,
-					Font = Enum.Font.SourceSansBold,
+					Font = BRAND.FontBold,
 					TextSize = 12,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4701,7 +4721,7 @@ local function windowLabel(parent, text, y, height, extra)
 		BackgroundTransparency = 1,
 		Text = text,
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 13,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
@@ -4721,7 +4741,7 @@ local function windowButton(parent, text, color, position, size)
 		BorderSizePixel = 0,
 		Text = text,
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 14,
 		AutoButtonColor = true,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4740,7 +4760,7 @@ local function windowBox(parent, placeholder, position, size, multiline)
 		PlaceholderText = placeholder,
 		PlaceholderColor3 = C.textDim,
 		TextColor3 = C.text,
-		Font = multiline and Enum.Font.Code or Enum.Font.SourceSans,
+		Font = multiline and Enum.Font.Code or BRAND.Font,
 		TextSize = multiline and 12 or 15,
 		ClearTextOnFocus = false,
 		MultiLine = multiline == true,
@@ -4777,7 +4797,7 @@ local function createList(parent, position, size)
 		BackgroundTransparency = 1,
 		Text = "No saved animations yet.",
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		LayoutOrder = -1,
@@ -4810,7 +4830,7 @@ local function fillList(list, entries, selectedName, onPick)
 			BackgroundTransparency = 1,
 			Text = entry.name,
 			TextColor3 = active and C.keySel or C.text,
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 14,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4827,7 +4847,7 @@ local function fillList(list, entries, selectedName, onPick)
 				entry.target
 			),
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 12,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -4843,10 +4863,10 @@ local function buildSaveWindow()
 	local saveGui, saveFrame = makeWindow("SynapseUiDesignerSave", "Synapse UI Designer - Save Animation", 380, 420)
 
 	windowLabel(saveFrame, "SAVE ANIMATION", 0, 18)
-	local saveInfo = windowLabel(saveFrame, "", 22, 34, { Font = Enum.Font.SourceSans, TextColor3 = C.text })
+	local saveInfo = windowLabel(saveFrame, "", 22, 34, { Font = BRAND.Font, TextColor3 = C.text })
 	local saveBox = windowBox(saveFrame, "Animation name...", UDim2.fromOffset(0, 62), UDim2.new(1, 0, 0, 30))
 	local saveAction = windowButton(saveFrame, "Save", C.green, UDim2.fromOffset(0, 98), UDim2.new(1, 0, 0, 30))
-	local saveMessage = windowLabel(saveFrame, "", 134, 34, { Font = Enum.Font.SourceSans })
+	local saveMessage = windowLabel(saveFrame, "", 134, 34, { Font = BRAND.Font })
 	windowLabel(saveFrame, "SAVED ANIMATIONS (click one to overwrite it)", 172, 18)
 	local saveList = createList(saveFrame, UDim2.fromOffset(0, 192), UDim2.new(1, 0, 1, -192))
 
@@ -4942,7 +4962,7 @@ local function buildImportWindow()
 	local deleteToken = 0
 
 	windowLabel(importFrame, "IMPORT INTO TIMELINE", 0, 18)
-	local importInfo = windowLabel(importFrame, "", 22, 30, { Font = Enum.Font.SourceSans, TextColor3 = C.text })
+	local importInfo = windowLabel(importFrame, "", 22, 30, { Font = BRAND.Font, TextColor3 = C.text })
 	windowLabel(importFrame, "SAVED ANIMATIONS (click to select)", 56, 18)
 	local importList = createList(importFrame, UDim2.fromOffset(0, 76), UDim2.new(1, 0, 0, 170))
 	local btnMode = windowButton(importFrame, "", C.gray, UDim2.fromOffset(0, 254), UDim2.new(1, 0, 0, 28))
@@ -4950,7 +4970,7 @@ local function buildImportWindow()
 		windowButton(importFrame, "Import selected", C.green, UDim2.fromOffset(0, 288), UDim2.new(0.5, -3, 0, 30))
 	local btnDeleteSelected =
 		windowButton(importFrame, "Delete", C.danger, UDim2.new(0.5, 3, 0, 288), UDim2.new(0.5, -3, 0, 30))
-	local importMessage = windowLabel(importFrame, "", 324, 44, { Font = Enum.Font.SourceSans })
+	local importMessage = windowLabel(importFrame, "", 324, 44, { Font = BRAND.Font })
 	windowLabel(importFrame, "JSON  (export a saved animation, or paste JSON and import it)", 372, 18)
 	local jsonBox = windowBox(importFrame, "{ ... }", UDim2.fromOffset(0, 392), UDim2.new(1, 0, 1, -428), true)
 	local btnExportJson = windowButton(
@@ -5583,7 +5603,7 @@ local function buildEffectsWindow()
 		BackgroundTransparency = 1,
 		Text = "Effects",
 		TextColor3 = C.text,
-		Font = Enum.Font.GothamBold,
+		Font = BRAND.FontBold,
 		TextSize = 17,
 		TextXAlignment = Enum.TextXAlignment.Left,
 	}, header)
@@ -5593,7 +5613,7 @@ local function buildEffectsWindow()
 		BackgroundTransparency = 1,
 		Text = "",
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5608,7 +5628,7 @@ local function buildEffectsWindow()
 		PlaceholderText = "Search effects...",
 		PlaceholderColor3 = C.textDim,
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 14,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		ClearTextOnFocus = false,
@@ -5663,7 +5683,7 @@ local function buildEffectsWindow()
 		RichText = true,
 		Text = "",
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
@@ -5677,7 +5697,7 @@ local function buildEffectsWindow()
 			BackgroundTransparency = 1,
 			Text = labelText,
 			TextColor3 = C.text,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}, bottom)
@@ -5689,7 +5709,7 @@ local function buildEffectsWindow()
 			Text = "",
 			TextColor3 = C.text,
 			PlaceholderColor3 = C.textDim,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			ClearTextOnFocus = false,
 		}, bottom)
@@ -5705,7 +5725,7 @@ local function buildEffectsWindow()
 			BorderSizePixel = 0,
 			Text = text,
 			TextColor3 = Color3.new(1, 1, 1),
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 13,
 			AutoButtonColor = true,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -5729,7 +5749,7 @@ local function buildEffectsWindow()
 		BorderSizePixel = 0,
 		Text = "Apply effect",
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 15,
 		AutoButtonColor = true,
 	}, bottom)
@@ -5741,7 +5761,7 @@ local function buildEffectsWindow()
 		BorderSizePixel = 0,
 		Text = "Replay",
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 14,
 		AutoButtonColor = true,
 	}, bottom)
@@ -5753,7 +5773,7 @@ local function buildEffectsWindow()
 		BorderSizePixel = 0,
 		Text = "Undo",
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 14,
 		AutoButtonColor = true,
 	}, bottom)
@@ -5765,7 +5785,7 @@ local function buildEffectsWindow()
 		BackgroundTransparency = 1,
 		Text = "Pick an effect. Double-click a card to apply it.",
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
@@ -6037,7 +6057,7 @@ local function buildEffectsWindow()
 					BackgroundTransparency = 1,
 					Text = fx.name,
 					TextColor3 = available and C.text or C.textDim,
-					Font = Enum.Font.SourceSansBold,
+					Font = BRAND.FontBold,
 					TextSize = 14,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextTruncate = Enum.TextTruncate.AtEnd,
@@ -6048,7 +6068,7 @@ local function buildEffectsWindow()
 					BackgroundTransparency = 1,
 					Text = fx.cat .. (fx.loops and "  -  loop" or "") .. (available and "" or "  -  n/a"),
 					TextColor3 = C.textDim,
-					Font = Enum.Font.SourceSans,
+					Font = BRAND.Font,
 					TextSize = 12,
 					TextXAlignment = Enum.TextXAlignment.Left,
 					TextTruncate = Enum.TextTruncate.AtEnd,
@@ -6075,7 +6095,7 @@ local function buildEffectsWindow()
 				BackgroundTransparency = 1,
 				Text = currentCat == "Recent" and "No recent effects yet." or "No effects match.",
 				TextColor3 = C.textDim,
-				Font = Enum.Font.SourceSans,
+				Font = BRAND.Font,
 				TextSize = 13,
 				AutoButtonColor = false,
 			}, grid)
@@ -6099,7 +6119,7 @@ local function buildEffectsWindow()
 			BorderSizePixel = 0,
 			Text = name,
 			TextColor3 = C.text,
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 13,
 			LayoutOrder = index,
 		}, tabs)
@@ -6191,7 +6211,7 @@ local function buildObjectsWindow()
 
 	local TEXT_STYLE = {
 		TextSize = 28,
-		Font = Enum.Font.GothamBold,
+		Font = BRAND.FontBold,
 		TextColor3 = Color3.new(1, 1, 1),
 	}
 
@@ -6313,7 +6333,7 @@ local function buildObjectsWindow()
 		BackgroundTransparency = 1,
 		Text = "Synapse UI Designer",
 		TextColor3 = C.text,
-		Font = Enum.Font.GothamBold,
+		Font = BRAND.FontBold,
 		TextSize = 15,
 		TextXAlignment = Enum.TextXAlignment.Left,
 	}, objHeaderBar)
@@ -6324,7 +6344,7 @@ local function buildObjectsWindow()
 			BackgroundTransparency = 1,
 			Text = text,
 			TextColor3 = C.textDim,
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 13,
 			TextXAlignment = Enum.TextXAlignment.Left,
 			LayoutOrder = objOrder(),
@@ -6338,7 +6358,7 @@ local function buildObjectsWindow()
 			BorderSizePixel = 0,
 			Text = text,
 			TextColor3 = C.text,
-			Font = Enum.Font.SourceSansBold,
+			Font = BRAND.FontBold,
 			TextSize = 13,
 			LayoutOrder = objOrder(),
 		}, parent or objRoot)
@@ -6358,7 +6378,7 @@ local function buildObjectsWindow()
 			BackgroundTransparency = 1,
 			Text = label,
 			TextColor3 = C.text,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			TextXAlignment = Enum.TextXAlignment.Left,
 		}, row)
@@ -6369,7 +6389,7 @@ local function buildObjectsWindow()
 			BorderSizePixel = 0,
 			Text = "",
 			TextColor3 = C.text,
-			Font = Enum.Font.SourceSans,
+			Font = BRAND.Font,
 			TextSize = 13,
 			ClearTextOnFocus = false,
 			TextTruncate = Enum.TextTruncate.AtEnd,
@@ -6384,7 +6404,7 @@ local function buildObjectsWindow()
 		BorderSizePixel = 0,
 		Text = "Open Effects panel",
 		TextColor3 = Color3.new(1, 1, 1),
-		Font = Enum.Font.SourceSansBold,
+		Font = BRAND.FontBold,
 		TextSize = 14,
 		LayoutOrder = objOrder(),
 	}, objRoot)
@@ -6429,7 +6449,7 @@ local function buildObjectsWindow()
 		BackgroundTransparency = 1,
 		Text = "",
 		TextColor3 = C.text,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
@@ -6463,7 +6483,7 @@ local function buildObjectsWindow()
 		BackgroundTransparency = 1,
 		Text = "No objects on stage yet.",
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 13,
 		TextXAlignment = Enum.TextXAlignment.Left,
 		LayoutOrder = -1,
@@ -6474,7 +6494,7 @@ local function buildObjectsWindow()
 		BackgroundTransparency = 1,
 		Text = "Only 1 object is animated at a time. Keyframes and events are saved on each object.",
 		TextColor3 = C.textDim,
-		Font = Enum.Font.SourceSans,
+		Font = BRAND.Font,
 		TextSize = 12,
 		TextWrapped = true,
 		TextXAlignment = Enum.TextXAlignment.Left,
@@ -6528,7 +6548,7 @@ local function buildObjectsWindow()
 						BorderSizePixel = 0,
 						Text = string.format("%s  [%s]", object.Name, object.ClassName),
 						TextColor3 = active and C.keySel or C.text,
-						Font = Enum.Font.SourceSans,
+						Font = BRAND.Font,
 						TextSize = 13,
 						TextXAlignment = Enum.TextXAlignment.Left,
 						TextTruncate = Enum.TextTruncate.AtEnd,
