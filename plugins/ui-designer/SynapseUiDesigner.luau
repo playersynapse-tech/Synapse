@@ -6965,17 +6965,6 @@ do
 		windowFocused = false
 	end)
 
-	local function ctrlDown()
-		return UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
-			or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
-			or UserInputService:IsKeyDown(Enum.KeyCode.LeftMeta)
-			or UserInputService:IsKeyDown(Enum.KeyCode.RightMeta)
-	end
-
-	local function shiftDown()
-		return UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)
-	end
-
 	local function jumpKey(direction)
 		local best = nil
 		for _, keyframe in ipairs(State.keyframes) do
@@ -7007,7 +6996,10 @@ do
 		end
 
 		local key = input.KeyCode
-		local ctrl = ctrlDown()
+		local ctrl = UserInputService:IsKeyDown(Enum.KeyCode.LeftControl)
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)
+			or UserInputService:IsKeyDown(Enum.KeyCode.LeftMeta)
+			or UserInputService:IsKeyDown(Enum.KeyCode.RightMeta)
 
 		if key == Enum.KeyCode.Escape then
 			A.closeMenu()
