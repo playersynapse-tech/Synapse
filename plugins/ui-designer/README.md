@@ -26,6 +26,6 @@ Build interfaces with a hierarchy, preview workspace, inspector and keyframe tim
 
 ### Plugin
 
-[Open plugin page on Roblox →](https://create.roblox.com/dashboard/creations/store/136370912247705/configure)
+[Open plugin page on Roblox →](https://create.roblox.com/store/asset/136370912247705/SynapseUiDesigner?viewFromStudio=true&keyword=&searchId=ff92379b-5d8f-404a-8d87-b4e7c38b8f82)
 
 > Designed to make professional Roblox UI animation more visual, organized and efficient.
