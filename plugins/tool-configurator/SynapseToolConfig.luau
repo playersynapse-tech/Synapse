@@ -1,29 +1,8 @@
---[[
-    Synapse Tool Configurator
-    Version: 2.0.0
-    Author: DagaroZz
-    Contributors: @SynapseOwner
-    Date: 30/09/2024
-    Revision: 2.0.0 - safety layer, confirmations, settings, log, theme-aware UI
-
-    DESIGN RULES (v2)
-    1. Nothing the user owns is ever destroyed. The only Destroy() calls go through
-       safeDestroy(), which refuses anything not created by this plugin.
-    2. Every action runs: inspect -> validate -> (confirm) -> record in ChangeHistory -> run.
-       If anything fails the recording is cancelled, so the game is rolled back.
-    3. Actions never convert implicitly. Only "Convert To Tool" and "FULL TOOL SETUP" do.
-    4. Objects can be locked with the "SynapseLocked" attribute and are then untouchable.
-]]
-
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local Selection = game:GetService("Selection")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local ServerStorage = game:GetService("ServerStorage")
-
-----------------------------------------------------------------------
--- CONSTANTS
-----------------------------------------------------------------------
 
 local VERSION = "2.0.0"
 local LOG_PREFIX = "[Synapse Tool Configurator] "
@@ -42,19 +21,15 @@ local SUCCESS = Color3.fromRGB(76, 175, 80)
 local DANGER = Color3.fromRGB(214, 90, 60)
 local WHITE = Color3.fromRGB(255, 255, 255)
 
-----------------------------------------------------------------------
--- CONFIG (persisted with plugin:SetSetting)
-----------------------------------------------------------------------
-
 local DEFAULT_CONFIG = {
-	confirmActions = true, -- ask before every action (warnings ALWAYS ask)
-	requireSingleSelection = true, -- refuse when more than one object is selected
-	backupBeforeConvert = false, -- clone the original into ServerStorage before converting
-	tagConfigured = true, -- mark finished tools with the SynapseConfigured attribute
-	unanchorParts = true, -- unanchor parts (anchored tools do not follow the hand)
-	verboseLog = false, -- also log the pre-flight notes
-	fullSetupJoint = "Motor6D", -- joint used by FULL TOOL SETUP
-	maxParts = 500, -- refuse objects with more parts than this
+	confirmActions = true,
+	requireSingleSelection = true,
+	backupBeforeConvert = false,
+	tagConfigured = true,
+	unanchorParts = true,
+	verboseLog = false,
+	fullSetupJoint = "Motor6D",
+	maxParts = 500,
 	gripPX = 0,
 	gripPY = -1,
 	gripPZ = 0,
@@ -120,10 +95,6 @@ end
 
 loadConfig()
 
-----------------------------------------------------------------------
--- THEME (follows the Studio light/dark theme)
-----------------------------------------------------------------------
-
 local THEME = {
 	bg = { "MainBackground", Color3.fromRGB(46, 46, 46) },
 	card = { "Titlebar", Color3.fromRGB(37, 37, 37) },
@@ -149,7 +120,7 @@ local function themeColor(key: string): Color3
 end
 
 local themeBindings = {}
-local refreshers: { () -> () } = {} -- called on theme change / config reset
+local refreshers: { () -> () } = {}
 
 local function bindTheme(inst: Instance, prop: string, key: string)
 	table.insert(themeBindings, { inst = inst, prop = prop, key = key });
@@ -167,10 +138,6 @@ local function levelColor(level: string): Color3
 	return themeColor("sub")
 end
 
-----------------------------------------------------------------------
--- REPORT / GUARD HELPERS
-----------------------------------------------------------------------
-
 local function newReport()
 	return { errors = {}, warnings = {}, notes = {} }
 end
@@ -187,7 +154,6 @@ local function addNote(report, message: string)
 	table.insert(report.notes, message)
 end
 
--- Instances created by the plugin during the current action (the only ones it may destroy).
 local createdThisAction: { [Instance]: boolean } = {}
 
 local function track<T>(inst: T & Instance): T & Instance
@@ -217,7 +183,6 @@ end
 
 local SUPPORTED_CLASSES = { "Model", "Folder", "Tool", "BasePart" }
 
--- Cheap checks (safe to run on every selection change).
 local function checkTarget(target: Instance, report)
 	if target == game or target.Parent == game then
 		addError(report, "Services (Workspace, Lighting, ...) cannot be modified by this plugin.")
@@ -250,7 +215,6 @@ local function checkTarget(target: Instance, report)
 	end
 end
 
--- Full scan (only run when the user clicks an action).
 local function scanTarget(target: Instance)
 	local scan = {
 		parts = {} :: { BasePart },
@@ -334,8 +298,6 @@ local function buildGrip(): CFrame
 		* CFrame.Angles(math.rad(config.gripRX), math.rad(config.gripRY), math.rad(config.gripRZ))
 end
 
--- Parts that are NOT yet connected (directly or through other joints) to the handle.
--- Prevents duplicate joints and joint loops.
 local function computeUnjoined(root: Instance, handle: BasePart, parts: { BasePart }): { BasePart }
 	local adjacency: { [BasePart]: { BasePart } } = {}
 
@@ -384,10 +346,6 @@ local function computeUnjoined(root: Instance, handle: BasePart, parts: { BasePa
 	return unjoined
 end
 
-----------------------------------------------------------------------
--- PRE-FLIGHT CHECKS (no mutation here)
-----------------------------------------------------------------------
-
 local function requireReadyTool(ctx, report): boolean
 	if not ctx.isTool then
 		addError(report, "Select a Tool first (or run Convert To Tool).")
@@ -418,7 +376,6 @@ local function checkConvert(ctx, report)
 		moves = handle ~= target
 	end
 
-	-- Name collisions that would make "Handle" ambiguous.
 	if isTool then
 		local existing = target:FindFirstChild("Handle")
 		if existing and existing ~= handle then
@@ -517,10 +474,6 @@ local function checkGrip(ctx, report)
 	ctx.work.grip = true
 end
 
-----------------------------------------------------------------------
--- STEPS (these mutate; always called inside a ChangeHistory recording)
-----------------------------------------------------------------------
-
 local function makeBackup(target: Instance, lines: { string })
 	local folder = ServerStorage:FindFirstChild(BACKUP_FOLDER_NAME)
 	if not folder then
@@ -545,7 +498,6 @@ local function makeBackup(target: Instance, lines: { string })
 	clone.Parent = folder
 	table.insert(lines, "Backup saved: ServerStorage." .. BACKUP_FOLDER_NAME .. "." .. clone.Name)
 
-	-- Prune only OUR old backups.
 	local backups = {}
 	for _, child in ipairs(folder:GetChildren()) do
 		if child:GetAttribute(BACKUP_ATTRIBUTE) == true and child ~= clone then
@@ -587,7 +539,7 @@ local function stepConvert(ctx, lines: { string }): Tool
 		track(tool)
 		tool.Name = target.Name
 		tool.RequiresHandle = true
-		tool.Parent = target.Parent -- same place as the original (not always Workspace)
+		tool.Parent = target.Parent
 		target.Parent = tool
 		table.insert(lines, ("Created Tool '%s'"):format(tool.Name))
 	end
@@ -664,10 +616,6 @@ local function stepGrip(tool: Tool, lines: { string })
 	tool.Grip = buildGrip()
 	table.insert(lines, "Grip applied (previous: " .. tostring(previous) .. ")")
 end
-
-----------------------------------------------------------------------
--- ACTIONS
-----------------------------------------------------------------------
 
 local ACTIONS = {}
 
@@ -838,7 +786,6 @@ local function inspectSelection(action)
 	return ctx, report
 end
 
--- Runs callback inside an undoable recording. Returns ok, err, canRollback.
 local function executeHistoryAction(actionName: string, callback: () -> ()): (boolean, any, boolean)
 	local supported, recording = pcall(function()
 		return ChangeHistoryService:TryBeginRecording(actionName)
@@ -856,7 +803,6 @@ local function executeHistoryAction(actionName: string, callback: () -> ()): (bo
 		return ok, err, true
 	end
 
-	-- Fallback for old Studio versions: waypoints only (no automatic rollback).
 	pcall(function()
 		ChangeHistoryService:SetWaypoint("Before " .. actionName)
 	end)
@@ -866,10 +812,6 @@ local function executeHistoryAction(actionName: string, callback: () -> ()): (bo
 	end)
 	return ok, err, false
 end
-
-----------------------------------------------------------------------
--- UI
-----------------------------------------------------------------------
 
 local toolbar = plugin:CreateToolbar("Synapse Tools")
 local openButton = toolbar:CreateButton("SynapseToolConfig", "Open Tool Configurator", "", "Tool Config")
@@ -946,8 +888,6 @@ local function attachHover(button: GuiButton, uiScale: UIScale)
 	end)
 end
 
--- Root --------------------------------------------------------------
-
 local root = new("Frame", { Name = "Root", Size = UDim2.fromScale(1, 1), BorderSizePixel = 0 }, widget)
 bindTheme(root, "BackgroundColor3", "bg")
 
@@ -1020,8 +960,6 @@ local toolsPage = createPage()
 local configPage = createPage()
 local logPage = createPage()
 
--- Tabs --------------------------------------------------------------
-
 local tabButtons: { [string]: TextButton } = {}
 local tabPages = { Tools = toolsPage, Config = configPage, Log = logPage }
 local tabOrder = { "Tools", "Config", "Log" }
@@ -1061,8 +999,6 @@ for index, name in ipairs(tabOrder) do
 	tabButtons[name] = button
 end
 table.insert(refreshers, refreshTabs)
-
--- Reusable components -------------------------------------------------
 
 local function addSection(parent: Instance, order: number, text: string)
 	label(parent, string.upper(text), 11, "sub", {
@@ -1233,8 +1169,6 @@ local function addCycle(parent: Instance, order: number, title: string, desc: st
 	end)
 end
 
--- Tools page ----------------------------------------------------------
-
 local infoCard = createCard(toolsPage, 1, 70)
 local infoScale = new("UIScale", nil, infoCard)
 local dot = new("Frame", { Position = UDim2.fromOffset(14, 14), Size = UDim2.fromOffset(10, 10), BorderSizePixel = 0 }, infoCard)
@@ -1289,7 +1223,7 @@ local function createActionButton(order: number, key: string, accent: boolean?)
 		TextTruncate = Enum.TextTruncate.AtEnd,
 	})
 	if accent then
-		-- keep readable on the accent colour in any theme
+
 		for i = #themeBindings, 1, -1 do
 			local b = themeBindings[i]
 			if b.inst == titleLabel or b.inst == descLabel then
@@ -1333,8 +1267,6 @@ label(toolsPage, "Nothing is ever deleted. Every action is one undo (Ctrl+Z). Lo
 	TextYAlignment = Enum.TextYAlignment.Top,
 })
 
--- Config page ---------------------------------------------------------
-
 addSection(configPage, 1, "Safety")
 addToggle(configPage, 2, "Confirm every action", "Ask before running. Warnings always ask.", "confirmActions")
 addToggle(configPage, 3, "Require single selection", "Refuse when several objects are selected.", "requireSingleSelection")
@@ -1358,13 +1290,9 @@ local resetButton = createSmallButton(configPage, "Reset settings to defaults", 
 })
 table.insert(allButtons, resetButton)
 
--- Log page ------------------------------------------------------------
-
 local clearLogButton = createSmallButton(logPage, "Clear log", { LayoutOrder = -100000, Size = UDim2.new(1, 0, 0, 30) })
 local logEntries: { { label: TextLabel, level: string } } = {}
 local logCounter = 0
-
--- Confirmation dialog ---------------------------------------------------
 
 local overlay = new("TextButton", {
 	Name = "Overlay",
@@ -1422,10 +1350,6 @@ local confirmButton = createSmallButton(dialogButtons, "Run", {
 })
 confirmButton.TextColor3 = WHITE
 
-----------------------------------------------------------------------
--- CONTROLLER
-----------------------------------------------------------------------
-
 local busy = false
 local pendingConfirm: BindableEvent? = nil
 local connections: { RBXScriptConnection } = {}
@@ -1460,7 +1384,7 @@ local function logMessage(level: string, text: string)
 	}, logPage)
 	table.insert(logEntries, { label = entryLabel, level = level })
 	while #logEntries > MAX_LOG_ENTRIES do
-		table.remove(logEntries, 1).label:Destroy() -- plugin's own UI label
+		table.remove(logEntries, 1).label:Destroy()
 	end
 end
 
@@ -1521,8 +1445,6 @@ local function applyTheme()
 	refreshInfo()
 end
 
--- Confirmation (yields until the user answers) ----------------------------
-
 local function confirm(title: string, message: string, confirmText: string, danger: boolean): boolean
 	if pendingConfirm then
 		return false
@@ -1540,7 +1462,7 @@ local function confirm(title: string, message: string, confirmText: string, dang
 
 	overlay.Visible = false
 	pendingConfirm = nil
-	event:Destroy() -- plugin's own BindableEvent
+	event:Destroy()
 	return result == true
 end
 
@@ -1581,8 +1503,6 @@ local function buildMessage(ctx, report): string
 	return table.concat(lines, "\n")
 end
 
--- Action runner ---------------------------------------------------------------
-
 local function runActionInner(key: string)
 	local action = ACTIONS[key]
 	local ctx, report = inspectSelection(action)
@@ -1614,7 +1534,7 @@ local function runActionInner(key: string)
 			say("info", action.title .. ": cancelled.")
 			return
 		end
-		-- The selection may have changed while the dialog was open.
+
 		local current = Selection:Get()[1]
 		if current ~= ctx.target or not ctx.target.Parent then
 			say("error", action.title .. ": selection changed while confirming. Aborted, nothing was modified.")
@@ -1659,8 +1579,6 @@ for key, button in pairs(actionButtons) do
 		guarded(runActionInner, key)
 	end)
 end
-
--- Lock / unlock -----------------------------------------------------------------
 
 local function runLockInner(lock: boolean)
 	if not RunService:IsEdit() then
@@ -1718,8 +1636,6 @@ unlockButton.MouseButton1Click:Connect(function()
 	guarded(runLockInner, false)
 end)
 
--- Config / log buttons ----------------------------------------------------------------
-
 resetButton.MouseButton1Click:Connect(function()
 	guarded(function()
 		if confirm("Reset settings", "Restore ALL settings to their defaults?\n\nYour game is not affected.", "Reset", true) then
@@ -1735,12 +1651,10 @@ end)
 
 clearLogButton.MouseButton1Click:Connect(function()
 	for _, entry in ipairs(logEntries) do
-		entry.label:Destroy() -- plugin's own UI labels
+		entry.label:Destroy()
 	end
 	table.clear(logEntries)
 end)
-
--- Studio integration -----------------------------------------------------------------
 
 openButton.Click:Connect(function()
 	widget.Enabled = not widget.Enabled
@@ -1768,12 +1682,8 @@ connect(plugin.Unloading, function()
 		connection:Disconnect()
 	end
 	table.clear(connections)
-	root:Destroy() -- plugin's own UI
+	root:Destroy()
 end)
-
-----------------------------------------------------------------------
--- START
-----------------------------------------------------------------------
 
 applyTheme()
 say("info", ("Synapse Tool Configurator v%s ready."):format(VERSION))
