@@ -7014,7 +7014,7 @@ do
 
 		if ctrl then
 			if key == Enum.KeyCode.Z then
-				if shiftDown() then
+				if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift) then
 					A.redo()
 				else
 					A.undo()
@@ -7067,7 +7067,7 @@ buildImportWindow()
 local objectsGui = buildObjectsWindow()
 local effectsGui = buildEffectsWindow()
 
-do
+local function initializeToolbar()
 	local toolbar = plugin:CreateToolbar("Synapse Tools")
 
 	local function addToolbarButton(id, tooltip, icon, text, window)
@@ -7080,13 +7080,14 @@ do
 			button:SetActive(window.Enabled)
 		end)
 		button:SetActive(window.Enabled)
-		return button
 	end
 
 	addToolbarButton("SynapseUiDesigner", "Open UI Designer", LOGO_IMAGE, "UI Designer", pluginGui)
 	addToolbarButton("SynapseUiDesignerObjects", "Open UI Designer Objects", LOGO_IMAGE, "UI Objects", objectsGui)
 	addToolbarButton("SynapseUiDesignerEffects", "Open the Effects panel", EFFECTS_ICON, "Effects", effectsGui)
 end
+
+initializeToolbar()
 
 plugin.Unloading:Connect(function()
 	stopPlayback()
