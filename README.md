@@ -28,7 +28,7 @@ Convert models and parts into fully configured Tools with automatic Handle setup
 
 Perfect for weapons, simulator items, equipment, and custom assets. Simplify your workflow and create professional Tools with ease.
 
-**[View Plugin →](./SynapseToolConfig.luau)**
+**[View on Roblox Creator Store →](https://create.roblox.com/dashboard/creations/store/121407719443899/configure)**
 
 ---
 
@@ -38,7 +38,7 @@ Perfect for weapons, simulator items, equipment, and custom assets. Simplify you
 
 Create and animate UI elements with position, size, rotation, color and transparency controls, use easing and playback tools, apply ready-made effects, work with animation events, and save reusable UI animations directly into Roblox Studio.
 
-**[View Plugin →](./SynapseUiDesigner.luau)**
+**[View on Roblox Creator Store →](https://create.roblox.com/dashboard/creations/store/136370912247705/configure)**
 
 ---
 
