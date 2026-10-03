@@ -1,0 +1,50 @@
+name: Bug report
+description: Report a reproducible problem in Synapse
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please provide enough information to reproduce the issue.
+
+  - type: input
+    id: plugin
+    attributes:
+      label: Plugin
+      description: Which Synapse plugin is affected?
+      placeholder: Synapse UI Designer
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: List the exact steps needed to reproduce the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include Roblox Studio version and relevant project information.
+    validations:
+      required: true
