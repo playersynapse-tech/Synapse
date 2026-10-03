@@ -19,8 +19,8 @@
 
 <p align="center">
 <img src="https://img.shields.io/badge/ROBLOX-STUDIO-101820?style=flat-square&logo=roblox&logoColor=white" alt="Roblox Studio" />
-<img src="https://img.shields.io/badge/TOOLS-CREATOR%20FOCUSED-007AFF?style=flat-square" alt="Creator-focused tools" />
-<img src="https://img.shields.io/badge/DESIGN-ANIMATION%20READY-00A6A6?style=flat-square" alt="Animation ready" />
+<img src="https://img.shields.io/badge/SOURCE-AVAILABLE-007AFF?style=flat-square" alt="Source available" />
+<img src="https://img.shields.io/badge/PLUGIN-TOOLS-00A6A6?style=flat-square" alt="Plugin tools" />
 </p>
 
 ## The Toolkit
