@@ -23,6 +23,6 @@ Convert models and parts into fully configured Tools with automatic Handle setup
 
 ### Plugin
 
-[Open plugin page on Roblox →](https://create.roblox.com/dashboard/creations/store/121407719443899/configure)
+[Open plugin page on Roblox →](https://create.roblox.com/store/asset/121407719443899?viewFromStudio=true&keyword=&searchId=ff92379b-5d8f-404a-8d87-b4e7c38b8f82)
 
 > Built for weapons, simulator items, equipment and custom Roblox assets.
