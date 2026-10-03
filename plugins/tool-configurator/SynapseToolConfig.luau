@@ -16,10 +16,29 @@ local MAX_BACKUPS = 5
 local MAX_LOG_ENTRIES = 100
 local SETTINGS_KEY = "SynapseToolConfig_v2"
 
-local ACCENT = Color3.fromRGB(0, 122, 255)
-local SUCCESS = Color3.fromRGB(76, 175, 80)
-local DANGER = Color3.fromRGB(214, 90, 60)
-local WHITE = Color3.fromRGB(255, 255, 255)
+local BRAND = {
+	Name = "Synapse",
+	Logo = "rbxassetid://136078562940326",
+	Accent = Color3.fromRGB(0, 122, 255),
+	Success = Color3.fromRGB(76, 175, 80),
+	Warning = Color3.fromRGB(246, 136, 0),
+	Danger = Color3.fromRGB(214, 90, 60),
+	Background = Color3.fromRGB(46, 46, 46),
+	Surface = Color3.fromRGB(37, 37, 37),
+	SurfaceAlt = Color3.fromRGB(60, 60, 60),
+	Text = Color3.fromRGB(229, 229, 229),
+	TextMuted = Color3.fromRGB(170, 170, 170),
+	Border = Color3.fromRGB(34, 34, 34),
+	Radius = 8,
+	Font = Enum.Font.Gotham,
+	FontMedium = BRAND.FontMedium,
+	FontSemibold = BRAND.FontSemibold,
+	FontBold = BRAND.FontBold,
+}
+local ACCENT = BRAND.Accent
+local SUCCESS = BRAND.Success
+local DANGER = BRAND.Danger
+local WHITE = BRAND.Text
 
 local DEFAULT_CONFIG = {
 	confirmActions = true,
@@ -96,27 +115,20 @@ end
 loadConfig()
 
 local THEME = {
-	bg = { "MainBackground", Color3.fromRGB(46, 46, 46) },
-	card = { "Titlebar", Color3.fromRGB(37, 37, 37) },
-	text = { "MainText", Color3.fromRGB(229, 229, 229) },
-	sub = { "SubText", Color3.fromRGB(170, 170, 170) },
-	border = { "Border", Color3.fromRGB(34, 34, 34) },
-	button = { "Button", Color3.fromRGB(60, 60, 60) },
-	buttonText = { "ButtonText", Color3.fromRGB(229, 229, 229) },
-	input = { "InputFieldBackground", Color3.fromRGB(37, 37, 37) },
-	warn = { "WarningText", Color3.fromRGB(246, 136, 0) },
-	err = { "ErrorText", Color3.fromRGB(255, 68, 68) },
+	bg = BRAND.Background,
+	card = BRAND.Surface,
+	text = BRAND.Text,
+	sub = BRAND.TextMuted,
+	border = BRAND.Border,
+	button = BRAND.SurfaceAlt,
+	buttonText = BRAND.Text,
+	input = BRAND.Surface,
+	warn = BRAND.Warning,
+	err = BRAND.Danger,
 }
 
 local function themeColor(key: string): Color3
-	local def = THEME[key]
-	local ok, color = pcall(function()
-		return settings().Studio.Theme:GetColor(Enum.StudioStyleGuideColor[def[1]])
-	end)
-	if ok and color then
-		return color
-	end
-	return def[2]
+	return THEME[key] or BRAND.Text
 end
 
 local themeBindings = {}
@@ -814,7 +826,7 @@ local function executeHistoryAction(actionName: string, callback: () -> ()): (bo
 end
 
 local toolbar = plugin:CreateToolbar("Synapse Tools")
-local openButton = toolbar:CreateButton("SynapseToolConfig", "Open Tool Configurator", "", "Tool Config")
+local openButton = toolbar:CreateButton("SynapseToolConfig", "Open Tool Configurator", BRAND.Logo, "Tool Config")
 pcall(function()
 	openButton.ClickableWhenViewportHidden = true
 end)
@@ -855,7 +867,7 @@ local function label(parent: Instance, text: string, size: number, colorKey: str
 		BackgroundTransparency = 1,
 		Text = text,
 		TextSize = size,
-		Font = Enum.Font.GothamMedium,
+		Font = BRAND.FontMedium,
 		TextXAlignment = Enum.TextXAlignment.Left,
 	}, parent)
 	bindTheme(l, "TextColor3", colorKey)
@@ -897,12 +909,12 @@ local logo = new("ImageLabel", {
 	Position = UDim2.fromOffset(10, 8),
 	Size = UDim2.fromOffset(28, 28),
 	BackgroundTransparency = 1,
-	Image = "rbxassetid://136078562940326",
+	Image = BRAND.Logo,
 }, header)
 label(header, "Synapse Tool Configurator", 16, "text", {
 	Position = UDim2.fromOffset(44, 0),
 	Size = UDim2.new(1, -120, 1, 0),
-	Font = Enum.Font.GothamBold,
+	Font = BRAND.FontBold,
 })
 label(header, "v" .. VERSION, 12, "sub", {
 	AnchorPoint = Vector2.new(1, 0),
@@ -979,7 +991,7 @@ for index, name in ipairs(tabOrder) do
 		Name = name,
 		Text = name,
 		TextSize = 13,
-		Font = Enum.Font.GothamSemibold,
+		Font = BRAND.FontSemibold,
 		BackgroundTransparency = 1,
 		Size = UDim2.new(1 / #tabOrder, 0, 1, 0),
 		Position = UDim2.new((index - 1) / #tabOrder, 0, 0, 0),
@@ -1004,7 +1016,7 @@ local function addSection(parent: Instance, order: number, text: string)
 	label(parent, string.upper(text), 11, "sub", {
 		LayoutOrder = order,
 		Size = UDim2.new(1, 0, 0, 18),
-		Font = Enum.Font.GothamBold,
+		Font = BRAND.FontBold,
 	})
 end
 
@@ -1020,7 +1032,7 @@ local function createSmallButton(parent: Instance, text: string, props: { [strin
 	local button = new("TextButton", {
 		Text = text,
 		TextSize = 13,
-		Font = Enum.Font.GothamSemibold,
+		Font = BRAND.FontSemibold,
 		AutoButtonColor = false,
 		BorderSizePixel = 0,
 	}, parent)
@@ -1042,7 +1054,7 @@ local function addToggle(parent: Instance, order: number, title: string, desc: s
 	label(row, title, 13, "text", {
 		Position = UDim2.fromOffset(12, 7),
 		Size = UDim2.new(1, -72, 0, 17),
-		Font = Enum.Font.GothamSemibold,
+		Font = BRAND.FontSemibold,
 	})
 	label(row, desc, 11, "sub", {
 		Position = UDim2.fromOffset(12, 25),
@@ -1100,7 +1112,7 @@ local function addNumberGroup(parent: Instance, order: number, title: string, de
 	label(row, title, 13, "text", {
 		Position = UDim2.fromOffset(12, 7),
 		Size = UDim2.new(1, -(total + 30), 0, 17),
-		Font = Enum.Font.GothamSemibold,
+		Font = BRAND.FontSemibold,
 	})
 	label(row, desc, 11, "sub", {
 		Position = UDim2.fromOffset(12, 25),
@@ -1117,7 +1129,7 @@ local function addNumberGroup(parent: Instance, order: number, title: string, de
 			PlaceholderText = hints[index],
 			ClearTextOnFocus = false,
 			TextSize = 12,
-			Font = Enum.Font.GothamMedium,
+			Font = BRAND.FontMedium,
 			BorderSizePixel = 0,
 			Text = formatNumber(config[key]),
 		}, row)
@@ -1145,7 +1157,7 @@ local function addCycle(parent: Instance, order: number, title: string, desc: st
 	label(row, title, 13, "text", {
 		Position = UDim2.fromOffset(12, 7),
 		Size = UDim2.new(1, -150, 0, 17),
-		Font = Enum.Font.GothamSemibold,
+		Font = BRAND.FontSemibold,
 	})
 	label(row, desc, 11, "sub", {
 		Position = UDim2.fromOffset(12, 25),
@@ -1176,7 +1188,7 @@ addCorner(dot, 5)
 local selName = label(infoCard, "Selected: None", 14, "text", {
 	Position = UDim2.fromOffset(32, 8),
 	Size = UDim2.new(1, -44, 0, 20),
-	Font = Enum.Font.GothamBold,
+	Font = BRAND.FontBold,
 	TextTruncate = Enum.TextTruncate.AtEnd,
 })
 local selDetail = label(infoCard, "", 12, "sub", {
@@ -1215,7 +1227,7 @@ local function createActionButton(order: number, key: string, accent: boolean?)
 	local titleLabel = label(button, action.title, 14, accent and "text" or "buttonText", {
 		Position = UDim2.fromOffset(14, 8),
 		Size = UDim2.new(1, -28, 0, 18),
-		Font = Enum.Font.GothamBold,
+		Font = BRAND.FontBold,
 	})
 	local descLabel = label(button, action.desc, 11, accent and "text" or "sub", {
 		Position = UDim2.fromOffset(14, 29),
@@ -1329,7 +1341,7 @@ new("UIPadding", {
 local dialogTitle = label(dialog, "", 15, "text", {
 	LayoutOrder = 1,
 	Size = UDim2.new(1, 0, 0, 20),
-	Font = Enum.Font.GothamBold,
+	Font = BRAND.FontBold,
 	ZIndex = 12,
 })
 local dialogMessage = label(dialog, "", 12, "sub", {
