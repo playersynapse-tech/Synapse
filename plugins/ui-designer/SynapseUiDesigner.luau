@@ -1,22 +1,3 @@
---[[
-	Synapse UI Designer  (v4 - reformulacao completa)
-	-------------------------------------------------------------
-	Novidades:
-	  * PAINEL DE EFFECTS (janela propria, botao proprio na toolbar com icone proprio):
-	      - ~40 efeitos prontos em categorias (Entrance, Exit, Attention, Text, Color, Loop)
-	      - busca, aba "Recent", duplo clique aplica, Replay do ultimo efeito
-	      - duracao, intensidade, easing (Style/Direction) e posicao (playhead / inicio / depois do ultimo key)
-	      - auto-preview do trecho aplicado, marcador de evento opcional, Undo direto no painel
-	  * Atalhos de teclado reais: Space, K, E, L, F, Home, End, setas, Shift+setas, Delete, Ctrl+Z/Y/C/X/V/D
-	  * Configuracoes salvas entre sessoes (auto-key, snap, speed, zoom, log, follow, efeitos recentes)
-	  * Reproducao mais leve (so escreve propriedades animadas) + preview de trecho
-	  * Menu de contexto proprio (sem PluginMenu), submenus com "< Back"
-	  * Corrigido: janelas Save/Import, rollback de efeitos com erro, leitura de valores float
-	  * Mesmo formato de dados (SynapseUiData) - animacoes antigas continuam validas.
-
-	COMO TROCAR O ICONE DO EFFECTS: altere a constante EFFECTS_ICON logo abaixo.
-]]
-
 if not plugin then
 	return
 end
@@ -29,10 +10,6 @@ local HttpService = game:GetService("HttpService")
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterGui = game:GetService("StarterGui")
-
-----------------------------------------------------------------------
--- Constantes
-----------------------------------------------------------------------
 
 local ATTRIBUTE_NAME = "SynapseUiData"
 local ID_ATTRIBUTE = "SynapseUiId"
@@ -48,7 +25,7 @@ local MAX_IMPORT_EVENTS = 1000
 local MAX_ANIMATION_TIME = 3600
 local MAX_EVENT_PARAMS = 24
 local LOGO_IMAGE = "rbxassetid://136078562940326"
-local EFFECTS_ICON = LOGO_IMAGE -- icone exclusivo do Effects (toolbar, botao e janela). Troque o asset aqui se quiser.
+local EFFECTS_ICON = LOGO_IMAGE
 local LEFT_PAD = 24
 local RULER_H = 24
 local KEY_LANE_Y = 54
@@ -95,32 +72,28 @@ local STYLES = Enum.EasingStyle:GetEnumItems()
 local DIRECTIONS = Enum.EasingDirection:GetEnumItems()
 
 local C = {
-	bg = Color3.fromRGB(33, 33, 36),
-	bar = Color3.fromRGB(44, 44, 48),
-	lane = Color3.fromRGB(24, 24, 27),
-	laneKeys = Color3.fromRGB(28, 28, 33),
-	laneEvents = Color3.fromRGB(33, 27, 42),
-	row = Color3.fromRGB(52, 52, 57),
-	text = Color3.fromRGB(235, 235, 235),
-	textDim = Color3.fromRGB(150, 150, 155),
-	blue = Color3.fromRGB(0, 120, 215),
-	red = Color3.fromRGB(219, 68, 85),
-	green = Color3.fromRGB(46, 204, 113),
-	orange = Color3.fromRGB(230, 126, 34),
-	purple = Color3.fromRGB(155, 89, 182),
-	teal = Color3.fromRGB(26, 188, 156),
-	event = Color3.fromRGB(178, 102, 255),
-	danger = Color3.fromRGB(150, 55, 65),
-	gray = Color3.fromRGB(95, 95, 100),
-	key = Color3.fromRGB(0, 140, 255),
-	keySel = Color3.fromRGB(241, 196, 15),
-	playhead = Color3.fromRGB(255, 70, 70),
-	selected = Color3.fromRGB(40, 78, 120),
+	bg = Color3.fromRGB(46, 46, 46),
+	bar = Color3.fromRGB(37, 37, 37),
+	lane = Color3.fromRGB(34, 34, 34),
+	laneKeys = Color3.fromRGB(37, 37, 37),
+	laneEvents = Color3.fromRGB(44, 44, 48),
+	row = Color3.fromRGB(60, 60, 60),
+	text = Color3.fromRGB(229, 229, 229),
+	textDim = Color3.fromRGB(170, 170, 170),
+	blue = Color3.fromRGB(0, 122, 255),
+	red = Color3.fromRGB(214, 90, 60),
+	green = Color3.fromRGB(76, 175, 80),
+	orange = Color3.fromRGB(246, 136, 0),
+	purple = Color3.fromRGB(0, 122, 255),
+	teal = Color3.fromRGB(0, 122, 255),
+	event = Color3.fromRGB(0, 122, 255),
+	danger = Color3.fromRGB(214, 90, 60),
+	gray = Color3.fromRGB(95, 95, 95),
+	key = Color3.fromRGB(0, 122, 255),
+	keySel = Color3.fromRGB(246, 136, 0),
+	playhead = Color3.fromRGB(214, 90, 60),
+	selected = Color3.fromRGB(60, 80, 110),
 }
-
-----------------------------------------------------------------------
--- Estado
-----------------------------------------------------------------------
 
 local State = {
 	target = nil,
@@ -158,13 +131,8 @@ local ancestryConnection = nil
 local playConnection = nil
 local drag = nil
 
--- Tabela de funcoes publicas (permite referencias adiante)
 local A = {}
 A.linkListeners = {}
-
-----------------------------------------------------------------------
--- Configuracoes persistentes
-----------------------------------------------------------------------
 
 do
 	local ok, saved = pcall(function()
@@ -225,10 +193,6 @@ function A.saveSettings()
 	end)
 end
 
-----------------------------------------------------------------------
--- Utilidades
-----------------------------------------------------------------------
-
 local function create(className, properties, parent)
 	local object = Instance.new(className)
 	for property, value in pairs(properties or {}) do
@@ -261,7 +225,6 @@ local function orderer()
 	end
 end
 
--- Cache por ClassName: evita pcall repetido a cada chamada
 local propertyCache = {}
 local function hasProperty(instance, name)
 	local className = instance.ClassName
@@ -332,10 +295,6 @@ local function trim(text)
 	result = result:gsub("%s+$", "")
 	return result
 end
-
-----------------------------------------------------------------------
--- Serializacao de valores
-----------------------------------------------------------------------
 
 local function serializeValue(value)
 	local kind = typeof(value)
@@ -483,10 +442,6 @@ local function lerpValue(a, b, alpha)
 	return alpha < 1 and a or b
 end
 
-----------------------------------------------------------------------
--- Eventos: nomes e parametros
-----------------------------------------------------------------------
-
 local function sanitizeEventName(name)
 	if type(name) ~= "string" then
 		return nil
@@ -582,7 +537,6 @@ local function parseParams(text)
 	return params
 end
 
--- Parametros tipados de eventos ---------------------------------------
 local EV = {}
 
 EV.TYPES = { "string", "number", "boolean", "Vector2", "Color3" }
@@ -723,10 +677,6 @@ local function cloneEvents(events)
 	return copy
 end
 
-----------------------------------------------------------------------
--- Keyframes
-----------------------------------------------------------------------
-
 local function makeKeyframe(time, properties, style, direction, events)
 	return {
 		Time = time,
@@ -804,7 +754,6 @@ local function evaluateProperty(property, time)
 	return lerpValue(previous.Properties[property], nextKey.Properties[property], alpha)
 end
 
--- Escreve apenas propriedades animadas (e restaura as que deixaram de ser)
 local function applyAt(time)
 	local target = State.target
 	if not target or not target.Parent then
@@ -833,7 +782,7 @@ local function applyAt(time)
 			end
 			pcall(function()
 				target[property] = value
-				applied[property] = target[property] -- le de volta (evita falso auto-key por arredondamento)
+				applied[property] = target[property]
 			end)
 		end
 	end
@@ -970,10 +919,6 @@ local function decodeKeyframes(list)
 	return keyframes
 end
 
-----------------------------------------------------------------------
--- Persistencia no objeto
-----------------------------------------------------------------------
-
 local function saveToTarget()
 	local target = State.target
 	if not target or not target.Parent then
@@ -1076,10 +1021,6 @@ local function loadFromTarget()
 	State.selected = State.keyframes[1]
 end
 
-----------------------------------------------------------------------
--- Undo / Redo
-----------------------------------------------------------------------
-
 local lastUndoKey, lastUndoAt = nil, 0
 
 local function snapshotState()
@@ -1112,10 +1053,6 @@ local function pushUndo(coalesceKey)
 	table.clear(State.redo)
 	A.updateHistoryButtons()
 end
-
-----------------------------------------------------------------------
--- Janela principal
-----------------------------------------------------------------------
 
 local pluginGui = plugin:CreateDockWidgetPluginGui(
 	"SynapseUiDesigner",
@@ -1233,10 +1170,6 @@ local function tip(object, text)
 	end)
 end
 
-----------------------------------------------------------------------
--- Barra superior
-----------------------------------------------------------------------
-
 local topOrder = orderer()
 local Btn = {}
 
@@ -1283,7 +1216,6 @@ topButton("link", "Link UI", C.blue, 84, "Link the object selected in the Explor
 topButton("key", "+ Keyframe", C.red, 96, "Add or update a keyframe at the playhead (K)")
 topButton("event", "+ Event", C.event, 80, "Add an event at the playhead time (E)")
 
--- Botao Effects com icone proprio
 do
 	local holder = create("Frame", {
 		Size = UDim2.fromOffset(98, 28),
@@ -1333,10 +1265,6 @@ topButton("clear", "Clear", C.gray, 64, "Remove every keyframe (can be undone)")
 topSeparator()
 topButton("log", "Log: on", C.gray, 70, "Print animation events to the Output while previewing")
 topButton("help", "?", C.gray, 30, "Mouse controls and keyboard shortcuts")
-
-----------------------------------------------------------------------
--- Painel lateral (propriedades + inspetor)
-----------------------------------------------------------------------
 
 local side = create("ScrollingFrame", {
 	Position = UDim2.new(1, -SIDE_W, 0, 0),
@@ -1580,10 +1508,6 @@ create("TextLabel", {
 	LayoutOrder = sideOrder(),
 }, side)
 
-----------------------------------------------------------------------
--- Ajuda
-----------------------------------------------------------------------
-
 local HELP_TEXT = table.concat({
 	"<b>TIMELINE (MOUSE)</b>",
 	"  Click / drag the ruler or lane       move the playhead",
@@ -1675,11 +1599,6 @@ end
 helpClose.MouseButton1Click:Connect(function()
 	A.toggleHelp(false)
 end)
-
-----------------------------------------------------------------------
--- Menu de contexto PROPRIO (substitui PluginMenu)
-----------------------------------------------------------------------
--- items: lista de { text, run } | { text, sub = {...} } | { separator = true }
 
 local MENU_SEPARATOR = { separator = true }
 
@@ -1847,7 +1766,6 @@ do
 	end
 end
 
--- Posicao (relativa a janela) logo abaixo de um GuiObject
 local function anchorBelow(object)
 	local origin = mainBg.AbsolutePosition
 	return Vector2.new(object.AbsolutePosition.X - origin.X, object.AbsolutePosition.Y - origin.Y + object.AbsoluteSize.Y + 2)
@@ -1857,10 +1775,6 @@ local function anchorFromInput(input)
 	local origin = mainBg.AbsolutePosition
 	return Vector2.new(input.Position.X - origin.X, input.Position.Y - origin.Y)
 end
-
-----------------------------------------------------------------------
--- Timeline: conversao e atualizacoes de UI
-----------------------------------------------------------------------
 
 local playhead = nil
 
@@ -1966,10 +1880,6 @@ function A.refreshValues()
 		A.onTextChanged()
 	end
 end
-
-----------------------------------------------------------------------
--- Lista de eventos do keyframe selecionado
-----------------------------------------------------------------------
 
 local pendingEventFocus = nil
 local pendingParamFocus = nil
@@ -2236,7 +2146,6 @@ function A.rebuildEventList()
 		cards[index] = card
 		local nextRow = orderer()
 
-		-- Cabecalho: ON/OFF, nome, teste, menu, apagar
 		local header = create("Frame", {
 			Size = UDim2.new(1, 0, 0, 24),
 			BackgroundTransparency = 1,
@@ -2299,7 +2208,6 @@ function A.rebuildEventList()
 			A.deleteEvent(keyframe, index)
 		end)
 
-		-- Linhas de parametros tipados
 		for _, key in ipairs(EV.sortedKeys(event.Params)) do
 			local value = event.Params[key]
 			local kind = EV.typeOf(value)
@@ -2443,7 +2351,6 @@ function A.rebuildEventList()
 			end
 		end
 
-		-- Rodape: entrada rapida + botao de novo parametro
 		local footer = create("Frame", {
 			Size = UDim2.new(1, 0, 0, 22),
 			BackgroundTransparency = 1,
@@ -2550,10 +2457,6 @@ function A.refreshInspector()
 
 	A.rebuildEventList()
 end
-
-----------------------------------------------------------------------
--- Operacoes de edicao
-----------------------------------------------------------------------
 
 local function captureProperties()
 	local properties = {}
@@ -3053,10 +2956,6 @@ function A.testEvent(keyframe, index)
 	A.onEventFired(event, keyframe.Time)
 end
 
-----------------------------------------------------------------------
--- Undo / Redo (restauracao)
-----------------------------------------------------------------------
-
 local function restoreSnapshot(snapshot)
 	stopPlayback()
 	State.keyframes = decodeKeyframes(snapshot.keys)
@@ -3107,10 +3006,6 @@ function A.redo()
 	restoreSnapshot(table.remove(State.redo))
 	notify("Redo", "ok")
 end
-
-----------------------------------------------------------------------
--- Edicao de valores e auto-key
-----------------------------------------------------------------------
 
 function A.commitText(property)
 	local entry = valueRows[property]
@@ -3198,10 +3093,6 @@ local function onTargetPropertyChanged(property)
 	afterEdit()
 end
 
-----------------------------------------------------------------------
--- Reproducao (tudo ou apenas um trecho)
-----------------------------------------------------------------------
-
 local function fireEvents(from, to)
 	for _, keyframe in ipairs(State.keyframes) do
 		if keyframe.Time > from and keyframe.Time <= to then
@@ -3222,7 +3113,6 @@ function A.onEventFired(event, time)
 	setHint("Event: " .. event.Name .. (params ~= "" and ("  " .. params) or ""), C.event, 1.6)
 end
 
--- fromTime/stopAt opcionais: usados pelo preview de efeitos
 local function startPlayback(fromTime, stopAt)
 	if not State.target then
 		notify("Link a UI first.", "error")
@@ -3304,10 +3194,6 @@ function A.togglePlay()
 		startPlayback()
 	end
 end
-
-----------------------------------------------------------------------
--- Vincular / desvincular objeto
-----------------------------------------------------------------------
 
 local function notifyLinkChanged()
 	for _, listener in ipairs(A.linkListeners) do
@@ -3399,10 +3285,6 @@ local function linkTarget(gui)
 	notifyLinkChanged()
 end
 
-----------------------------------------------------------------------
--- Zoom / Snap
-----------------------------------------------------------------------
-
 local function setSnap(step)
 	State.snap = step
 	A.updateToggleButtons()
@@ -3429,10 +3311,6 @@ function A.fitZoom()
 	A.rebuildTimeline()
 	scroll.CanvasPosition = Vector2.new(0, 0)
 end
-
-----------------------------------------------------------------------
--- Menus especificos (usam A.openMenu)
-----------------------------------------------------------------------
 
 local function styleMenuItems(keyframe)
 	local list = {}
@@ -3599,10 +3477,6 @@ function A.openTimelineMenu(time, position)
 
 	A.openMenu(items, position)
 end
-
-----------------------------------------------------------------------
--- Interacao da timeline (drag, scrub, wheel)
-----------------------------------------------------------------------
 
 local timelineRefreshQueued = false
 
@@ -4006,10 +3880,6 @@ do
 	end)
 end
 
-----------------------------------------------------------------------
--- Exportacao: ID, template do ModuleScript
-----------------------------------------------------------------------
-
 local function ensureId(target)
 	local current = target:GetAttribute(ID_ATTRIBUTE)
 	if current == nil then
@@ -4117,7 +3987,6 @@ local function evaluate(track, time)
 	return lerp(previous.Value, nextKey.Value, alpha)
 end
 
--- GetEvents() returns every event; GetEvents("Damage") only the ones with that name.
 function Animation.GetEvents(name)
 	local copy = {}
 	for _, event in ipairs(EVENTS) do
@@ -4149,7 +4018,6 @@ function Animation.Find(root)
 	return root:FindFirstChild(Animation.TargetName, true)
 end
 
--- Create a controller for the target UI object.
 function Animation.new(target)
 	target = target or Animation.Find()
 	assert(typeof(target) == "Instance", "Animation.new could not find the object (pass a GuiObject or check the ID).")
@@ -4186,7 +4054,6 @@ function Animation:_apply(time)
 	end
 end
 
--- Listen to all events with EventFired or subscribe to one event by name.
 function Animation:GetEventSignal(name)
 	local event = self._named[name]
 	if not event then
@@ -4200,7 +4067,6 @@ function Animation:OnEvent(name, callback)
 	return self:GetEventSignal(name):Connect(callback)
 end
 
--- Connect many events at once: anim:OnEvents({ Damage = function(params, time) end })
 function Animation:OnEvents(map)
 	local connections = {}
 	for name, callback in pairs(map) do
@@ -4258,7 +4124,6 @@ function Animation:_connect()
 	self.IsPaused = false
 end
 
--- Use Play(speed, loop) to start playback; Pause, Resume, Seek, and Stop control it.
 function Animation:Play(speed, loop)
 	self:Stop()
 
@@ -4298,7 +4163,6 @@ function Animation:Resume()
 	end
 end
 
--- Seek(seconds, true) also fires the events between the old and the new time.
 function Animation:Seek(seconds, fireEvents)
 	local previous = self.Time
 	self.Time = math.clamp(seconds, 0, Animation.Duration)
@@ -4456,10 +4320,6 @@ local function buildModuleSource(animName)
 
 	return source
 end
-
-----------------------------------------------------------------------
--- Biblioteca (ReplicatedStorage/UIAnimations)
-----------------------------------------------------------------------
 
 local Library = {}
 
@@ -4815,10 +4675,6 @@ function Library.importJson(json, mode)
 	return Library.apply(data, mode)
 end
 
-----------------------------------------------------------------------
--- Janelas de Save / Import
-----------------------------------------------------------------------
-
 local Windows = {}
 
 local function makeWindow(id, title, width, height)
@@ -4983,7 +4839,6 @@ local function fillList(list, entries, selectedName, onPick)
 	end
 end
 
--- ===== Janela Save =====
 local function buildSaveWindow()
 	local saveGui, saveFrame = makeWindow("SynapseUiDesignerSave", "Synapse UI Designer - Save Animation", 380, 420)
 
@@ -5078,7 +4933,6 @@ local function buildSaveWindow()
 	end
 end
 
--- ===== Janela Import =====
 local function buildImportWindow()
 	local importGui, importFrame =
 		makeWindow("SynapseUiDesignerImport", "Synapse UI Designer - Import Animation", 380, 580)
@@ -5242,10 +5096,6 @@ local function buildImportWindow()
 	end
 end
 
-----------------------------------------------------------------------
--- Painel de EFFECTS
-----------------------------------------------------------------------
-
 local function buildEffectsWindow()
 	local S, D = Enum.EasingStyle, Enum.EasingDirection
 	local TRANSP = {
@@ -5273,7 +5123,6 @@ local function buildEffectsWindow()
 		return State.target ~= nil and hasProperty(State.target, property)
 	end
 
-	-- Contexto entregue a cada efeito -------------------------------
 	local function makeContext(t, d, amount, styleOverride, dirOverride)
 		local c = { t = t, d = d, amount = amount, touched = 0 }
 
@@ -5312,7 +5161,6 @@ local function buildEffectsWindow()
 			return keyframe
 		end
 
-		-- segura o valor inicial antes do efeito quando ele nao comeca em 0s
 		function c.hold(property, value)
 			if t <= 0.0005 then
 				return
@@ -5351,7 +5199,6 @@ local function buildEffectsWindow()
 		return UDim2.new(v.X.Scale + sx, v.X.Offset + (ox or 0), v.Y.Scale + sy, v.Y.Offset + (oy or 0))
 	end
 
-	-- propriedades de transparencia que devem ser animadas
 	local function fadeProps(c, fadingIn, only)
 		local list = {}
 		for _, property in ipairs(only or TRANSP) do
@@ -5401,7 +5248,6 @@ local function buildEffectsWindow()
 		BY_ID[id] = fx
 	end
 
-	-- ENTRANCE -------------------------------------------------------
 	def("fadeIn", "Fade In", "Entrance", "Appears smoothly from transparent.", 0.4, nil, nil, TRANSP, function(c)
 		for _, entry in ipairs(fadeProps(c, true)) do
 			c.enter(entry[1], 1, entry[2], c.st(S.Quad), c.di(D.Out))
@@ -5475,7 +5321,6 @@ local function buildEffectsWindow()
 		c.enter("Position", shift(base, 0, 0, 0, -c.amount), base, c.st(S.Bounce), c.di(D.Out))
 	end)
 
-	-- EXIT -----------------------------------------------------------
 	def("fadeOut", "Fade Out", "Exit", "Disappears smoothly.", 0.4, nil, nil, TRANSP, function(c)
 		for _, entry in ipairs(fadeProps(c, false)) do
 			c.exit(entry[1], entry[2], 1, c.st(S.Quad), c.di(D.In))
@@ -5511,7 +5356,6 @@ local function buildEffectsWindow()
 		end
 	end)
 
-	-- ATTENTION ------------------------------------------------------
 	def("pulse", "Pulse", "Attention", "Quick grow and return.", 0.4, 15, "Grow (%)", { "Size" }, function(c)
 		local base = c.base("Size")
 		local peak = scaleSize(base, 1 + c.amount / 100)
@@ -5608,7 +5452,6 @@ local function buildEffectsWindow()
 		c.key(c.t + c.d, "Rotation", r + c.amount)
 	end)
 
-	-- TEXT -----------------------------------------------------------
 	def("typewriter", "Typewriter", "Text", "Reveals the text one character at a time.", 1.5, nil, nil, { "MaxVisibleGraphemes" }, function(c)
 		if not has("Text") then
 			return false, "This object has no text."
@@ -5644,7 +5487,6 @@ local function buildEffectsWindow()
 		c.key(c.t + c.d, "TextSize", base)
 	end)
 
-	-- COLOR ----------------------------------------------------------
 	local function colorFlash(id, name, desc, target, amountDefault)
 		def(id, name, "Color", desc, 0.5, amountDefault, "Intensity (%)", { "TextColor3", "ImageColor3", "BackgroundColor3" }, function(c)
 			for _, property in ipairs(colorProps(c)) do
@@ -5673,7 +5515,6 @@ local function buildEffectsWindow()
 		end
 	end)
 
-	-- LOOP -----------------------------------------------------------
 	def("float", "Float", "Loop", "Gently floats up and down (enables Loop).", 1.6, 10, "Height (pixels)", { "Position" }, function(c)
 		local base = c.base("Position")
 		c.key(c.t, "Position", base, c.st(S.Sine), c.di(D.InOut))
@@ -5705,7 +5546,6 @@ local function buildEffectsWindow()
 		end
 	end, true)
 
-	-- UI ---------------------------------------------------------------
 	local gui = plugin:CreateDockWidgetPluginGui(
 		"SynapseUiDesignerEffects",
 		DockWidgetPluginGuiInfo.new(Enum.InitialDockState.Float, false, false, 340, 600, 300, 400)
@@ -5722,7 +5562,6 @@ local function buildEffectsWindow()
 	}, gui)
 	padding(root, 8, 8, 8, 8)
 
-	-- Cabecalho com icone exclusivo
 	local header = create("Frame", { Size = UDim2.new(1, 0, 0, 40), BackgroundTransparency = 1 }, root)
 	local badge = create("Frame", {
 		Size = UDim2.fromOffset(38, 38),
@@ -5938,10 +5777,9 @@ local function buildEffectsWindow()
 		status.TextColor3 = kind == "error" and Color3.fromRGB(255, 120, 130) or (kind == "ok" and C.green or C.textDim)
 	end
 
-	-- estado da janela
 	local selected = EFFECTS[1]
 	local currentCat = "All"
-	local styleIndex, dirIndex = 0, 0 -- 0 = Auto
+	local styleIndex, dirIndex = 0, 0
 	local lastRange = nil
 	local cardClick = { id = nil, at = 0 }
 	local tabButtons = {}
@@ -6145,7 +5983,6 @@ local function buildEffectsWindow()
 		end
 	end
 
-	-- cartoes ---------------------------------------------------------
 	rebuildCards = function()
 		for _, child in ipairs(grid:GetChildren()) do
 			if child:IsA("TextButton") then
@@ -6233,7 +6070,7 @@ local function buildEffectsWindow()
 		end
 
 		if shown == 0 then
-			-- cartao vazio informativo (TextButton para ser limpo na proxima reconstrucao)
+
 			local empty = create("TextButton", {
 				BackgroundTransparency = 1,
 				Text = currentCat == "Recent" and "No recent effects yet." or "No effects match.",
@@ -6276,7 +6113,6 @@ local function buildEffectsWindow()
 		end)
 	end
 
-	-- eventos dos controles
 	searchBox:GetPropertyChangedSignal("Text"):Connect(rebuildCards)
 
 	styleButton.MouseButton1Click:Connect(function()
@@ -6318,7 +6154,6 @@ local function buildEffectsWindow()
 		refreshControls()
 	end)
 
-	-- integra com o resto do plugin
 	table.insert(A.linkListeners, function()
 		lastRange = nil
 		refreshControls()
@@ -6340,10 +6175,6 @@ local function buildEffectsWindow()
 
 	return gui
 end
-
-----------------------------------------------------------------------
--- Janela de objetos (criar/gerenciar objetos de UI no palco)
-----------------------------------------------------------------------
 
 local function linkSelection()
 	local selected = Selection:Get()[1]
@@ -6547,7 +6378,6 @@ local function buildObjectsWindow()
 		return row, box
 	end
 
-	-- atalho direto para o painel de Effects (com o mesmo icone)
 	local fxButton = create("TextButton", {
 		Size = UDim2.new(1, 0, 0, 30),
 		BackgroundColor3 = C.purple,
@@ -6834,10 +6664,6 @@ local function buildObjectsWindow()
 	return objectsGui
 end
 
-----------------------------------------------------------------------
--- Ligacao dos botoes
-----------------------------------------------------------------------
-
 Btn.link.MouseButton1Click:Connect(linkSelection)
 Btn.key.MouseButton1Click:Connect(A.recordKeyframe)
 Btn.event.MouseButton1Click:Connect(function()
@@ -6954,7 +6780,6 @@ Insp.timeBox.FocusLost:Connect(function()
 	A.refreshInspector()
 end)
 
--- Botoes Style / Direction abrem o menu proprio logo abaixo do botao
 Insp.btnStyle.MouseButton1Click:Connect(function()
 	local keyframe = State.selected
 	if not keyframe then
@@ -6991,10 +6816,6 @@ Insp.btnPreset.MouseButton1Click:Connect(function()
 		A.addEvent(keyframe, preset)
 	end), anchorBelow(Insp.btnPreset))
 end)
-
-----------------------------------------------------------------------
--- Atalhos de teclado
-----------------------------------------------------------------------
 
 do
 	local windowFocused = false
@@ -7109,10 +6930,6 @@ do
 		end
 	end)
 end
-
-----------------------------------------------------------------------
--- Inicializacao
-----------------------------------------------------------------------
 
 buildSaveWindow()
 buildImportWindow()
