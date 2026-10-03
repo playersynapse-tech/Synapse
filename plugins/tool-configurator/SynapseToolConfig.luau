@@ -31,9 +31,9 @@ local BRAND = {
 	Border = Color3.fromRGB(34, 34, 34),
 	Radius = 8,
 	Font = Enum.Font.Gotham,
-	FontMedium = BRAND.FontMedium,
-	FontSemibold = BRAND.FontSemibold,
-	FontBold = BRAND.FontBold,
+	FontMedium = Enum.Font.GothamMedium,
+	FontSemibold = Enum.Font.GothamSemibold,
+	FontBold = Enum.Font.GothamBold,
 }
 local ACCENT = BRAND.Accent
 local SUCCESS = BRAND.Success
