@@ -35,6 +35,125 @@ local BRAND = {
 	FontSemibold = Enum.Font.GothamSemibold,
 	FontBold = Enum.Font.GothamBold,
 }
+
+local DesignSystem = {
+	Spacing = { XS = 4, SM = 8, MD = 12, LG = 16, XL = 24 },
+	Size = { Header = 48, Toolbar = 36, Tab = 34, Button = 32, Input = 32, Status = 28 },
+	Radius = { Small = 6, Medium = 8, Large = 10, Pill = 999 },
+	Motion = {
+		Fast = TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Normal = TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Press = TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+		Release = TweenInfo.new(0.16, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+	},
+	Color = {
+		Background = BRAND.Background,
+		Surface = BRAND.Surface,
+		SurfaceAlt = BRAND.SurfaceAlt,
+		Border = BRAND.Border,
+		Accent = BRAND.Accent,
+		Text = BRAND.Text,
+		TextMuted = BRAND.TextMuted,
+		Success = BRAND.Success,
+		Warning = BRAND.Warning,
+		Danger = BRAND.Danger,
+	},
+	Font = {
+		Regular = BRAND.Font,
+		Medium = BRAND.FontMedium,
+		Semibold = BRAND.FontSemibold,
+		Bold = BRAND.FontBold,
+	},
+}
+
+local function applyCorner(instance: Instance, radius: number)
+	local corner = instance:FindFirstChildOfClass("UICorner") or Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, radius)
+	corner.Parent = instance
+	return corner
+end
+
+local function applyBorder(instance: Instance, color: Color3?, transparency: number?)
+	local stroke = instance:FindFirstChildOfClass("UIStroke") or Instance.new("UIStroke")
+	stroke.Thickness = 1
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Color = color or DesignSystem.Color.Border
+	stroke.Transparency = transparency or 0
+	stroke.Parent = instance
+	return stroke
+end
+
+local function styleSurface(instance: GuiObject, radius: number?)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	applyCorner(instance, radius or DesignSystem.Radius.Medium)
+	applyBorder(instance)
+	return instance
+end
+
+local function styleButton(instance: GuiButton, accent: boolean?)
+	instance.AutoButtonColor = false
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = accent and DesignSystem.Color.Accent or DesignSystem.Color.SurfaceAlt
+	instance.TextColor3 = DesignSystem.Color.Text
+	instance.Font = DesignSystem.Font.Semibold
+	instance.TextSize = 13
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance, accent and DesignSystem.Color.Accent or DesignSystem.Color.Border)
+	local scale = instance:FindFirstChildOfClass("UIScale") or Instance.new("UIScale")
+	scale.Scale = 1
+	scale.Parent = instance
+	instance.MouseEnter:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Fast, { Scale = 1.02 }):Play()
+	end)
+	instance.MouseLeave:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Fast, { Scale = 1 }):Play()
+	end)
+	instance.MouseButton1Down:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Press, { Scale = 0.97 }):Play()
+	end)
+	instance.MouseButton1Up:Connect(function()
+		TweenService:Create(scale, DesignSystem.Motion.Release, { Scale = 1 }):Play()
+	end)
+	return instance
+end
+
+local function styleInput(instance: TextBox)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Background
+	instance.TextColor3 = DesignSystem.Color.Text
+	instance.PlaceholderColor3 = DesignSystem.Color.TextMuted
+	instance.Font = DesignSystem.Font.Regular
+	instance.TextSize = 13
+	instance.ClearTextOnFocus = false
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance)
+	return instance
+end
+
+local function styleTab(instance: GuiButton, active: boolean)
+	instance.AutoButtonColor = false
+	instance.BackgroundTransparency = 0
+	instance.BackgroundColor3 = active and DesignSystem.Color.SurfaceAlt or DesignSystem.Color.Surface
+	instance.TextColor3 = active and DesignSystem.Color.Text or DesignSystem.Color.TextMuted
+	instance.Font = DesignSystem.Font.Semibold
+	instance.TextSize = 13
+	applyCorner(instance, DesignSystem.Radius.Small)
+	applyBorder(instance, active and DesignSystem.Color.Accent or DesignSystem.Color.Border)
+	return instance
+end
+
+local function styleHeader(instance: GuiObject)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	return instance
+end
+
+local function styleStatus(instance: GuiObject)
+	instance.BorderSizePixel = 0
+	instance.BackgroundColor3 = DesignSystem.Color.Surface
+	return instance
+end
 local ACCENT = BRAND.Accent
 local SUCCESS = BRAND.Success
 local DANGER = BRAND.Danger
@@ -838,8 +957,8 @@ local widget = plugin:CreateDockWidgetPluginGui(
 widget.Title = "Synapse Tool Configurator"
 widget.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-local tweenFast = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-local tweenBounce = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+local tweenFast = DesignSystem.Motion.Fast
+local tweenBounce = DesignSystem.Motion.Release
 
 local function new(className: string, props: { [string]: any }?, parent: Instance?): any
 	local inst = Instance.new(className)
@@ -853,7 +972,7 @@ local function new(className: string, props: { [string]: any }?, parent: Instanc
 end
 
 local function addCorner(inst: Instance, radius: number)
-	return new("UICorner", { CornerRadius = UDim.new(0, radius) }, inst)
+	return applyCorner(inst, radius)
 end
 
 local function addStroke(inst: Instance, key: string)
@@ -890,21 +1009,24 @@ end
 
 local function attachHover(button: GuiButton, uiScale: UIScale)
 	button.MouseEnter:Connect(function()
-		TweenService:Create(uiScale, tweenFast, { Scale = 1.015 }):Play()
+		TweenService:Create(uiScale, DesignSystem.Motion.Fast, { Scale = 1.02 }):Play()
 	end)
 	button.MouseLeave:Connect(function()
-		TweenService:Create(uiScale, tweenFast, { Scale = 1 }):Play()
+		TweenService:Create(uiScale, DesignSystem.Motion.Fast, { Scale = 1 }):Play()
 	end)
 	button.MouseButton1Down:Connect(function()
-		animateClick(uiScale)
+		TweenService:Create(uiScale, DesignSystem.Motion.Press, { Scale = 0.97 }):Play()
+	end)
+	button.MouseButton1Up:Connect(function()
+		TweenService:Create(uiScale, DesignSystem.Motion.Release, { Scale = 1 }):Play()
 	end)
 end
 
 local root = new("Frame", { Name = "Root", Size = UDim2.fromScale(1, 1), BorderSizePixel = 0 }, widget)
 bindTheme(root, "BackgroundColor3", "bg")
 
-local header = new("Frame", { Size = UDim2.new(1, 0, 0, 44), BorderSizePixel = 0 }, root)
-bindTheme(header, "BackgroundColor3", "card")
+local header = new("Frame", { Size = UDim2.new(1, 0, 0, DesignSystem.Size.Header), BorderSizePixel = 0 }, root)
+styleHeader(header)
 local logo = new("ImageLabel", {
 	Position = UDim2.fromOffset(10, 8),
 	Size = UDim2.fromOffset(28, 28),
@@ -912,23 +1034,23 @@ local logo = new("ImageLabel", {
 	Image = BRAND.Logo,
 }, header)
 label(header, "Synapse Tool Configurator", 16, "text", {
-	Position = UDim2.fromOffset(44, 0),
+	Position = UDim2.fromOffset(DesignSystem.Size.Header, 0),
 	Size = UDim2.new(1, -120, 1, 0),
 	Font = BRAND.FontBold,
 })
 label(header, "v" .. VERSION, 12, "sub", {
 	AnchorPoint = Vector2.new(1, 0),
 	Position = UDim2.new(1, -14, 0, 0),
-	Size = UDim2.fromOffset(60, 44),
+	Size = UDim2.fromOffset(60, DesignSystem.Size.Header),
 	TextXAlignment = Enum.TextXAlignment.Right,
 })
 
-local tabBar = new("Frame", { Position = UDim2.fromOffset(0, 44), Size = UDim2.new(1, 0, 0, 32), BorderSizePixel = 0 }, root)
-bindTheme(tabBar, "BackgroundColor3", "card")
+local tabBar = new("Frame", { Position = UDim2.fromOffset(0, DesignSystem.Size.Header), Size = UDim2.new(1, 0, 0, DesignSystem.Size.Tab), BorderSizePixel = 0 }, root)
+styleHeader(tabBar)
 
 local pages = new("Frame", {
 	Position = UDim2.fromOffset(0, 76),
-	Size = UDim2.new(1, 0, 1, -104),
+	Size = UDim2.new(1, 0, 1, -(DesignSystem.Size.Header + DesignSystem.Size.Tab + DesignSystem.Size.Status)),
 	BackgroundTransparency = 1,
 	ClipsDescendants = true,
 }, root)
@@ -936,10 +1058,10 @@ local pages = new("Frame", {
 local statusBar = new("Frame", {
 	AnchorPoint = Vector2.new(0, 1),
 	Position = UDim2.fromScale(0, 1),
-	Size = UDim2.new(1, 0, 0, 28),
+	Size = UDim2.new(1, 0, 0, DesignSystem.Size.Status),
 	BorderSizePixel = 0,
 }, root)
-bindTheme(statusBar, "BackgroundColor3", "card")
+styleStatus(statusBar)
 local statusLabel = label(statusBar, "Ready.", 12, "sub", {
 	Position = UDim2.fromOffset(12, 0),
 	Size = UDim2.new(1, -24, 1, 0),
