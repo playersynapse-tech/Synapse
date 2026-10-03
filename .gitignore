@@ -1,0 +1,39 @@
+# Roblox Studio
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxmd
+*.rbxl.lock
+*.rbxm.lock
+
+# Roblox Studio local files
+*.rbxlx.lock
+*.rbxmx.lock
+*.bak
+
+# Luau / tooling
+luau-bin/
+node_modules/
+dist/
+build/
+coverage/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Operating system
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/*
+!.vscode/settings.json
+.idea/
