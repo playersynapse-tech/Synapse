@@ -16,23 +16,29 @@
 
 Each project is developed individually, with its own purpose and workflow, while sharing the same goal: making development more creative, efficient and powerful.
 
-Synapse is built around **tools, experimentation and continuous improvement** — turning ideas into practical systems for creators.
-
 ---
 
 ## Plugins
 
-<div align="center">
+### 🛠️ Synapse Tool Configurator
+
+**Synapse Tool Configurator** is a Roblox Studio plugin that makes Tool creation faster and easier.
+
+Convert models and parts into fully configured Tools with automatic Handle setup, joints, Grip settings, and attachments. Includes smart validation, backups, customizable options, and a complete one-click Tool Setup system.
+
+Perfect for weapons, simulator items, equipment, and custom assets. Simplify your workflow and create professional Tools with ease.
+
+**[View Plugin →](./SynapseToolConfig.luau)**
+
+---
 
 ### 🎨 Synapse UI Designer
 
-[**View Plugin →**](./Plugins/UI%20Designer)
+**Synapse UI Designer** is a visual UI creation and animation tool for Roblox Studio, combining a hierarchy, preview workspace, inspector and keyframe timeline into one workflow.
 
-### ✦ Synapse UI Animation
+Create and animate UI elements with position, size, rotation, color and transparency controls, use easing and playback tools, apply ready-made effects, work with animation events, and save reusable UI animations directly into Roblox Studio.
 
-[**View Plugin →**](./Plugins/UI%20Animation)
-
-</div>
+**[View Plugin →](./SynapseUiDesigner.luau)**
 
 ---
 
