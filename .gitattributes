@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+*.luau text linguist-language=Luau
+*.lua text linguist-language=Luau
+*.md text
+*.yml text
+*.yaml text
