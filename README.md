@@ -28,7 +28,7 @@ Synapse is built around **tools, experimentation and continuous improvement** �
 
 [**View Plugin →**](./Plugins/UI%20Designer)
 
-### ✦ Synapse UI Animation System
+### ✦ Synapse UI Animation
 
 [**View Plugin →**](./Plugins/UI%20Animation)
 
